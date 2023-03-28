@@ -51,7 +51,7 @@ class Niveau {
         this.creerSkybox();
 
         this.creerSol();
-        this.creerSol2();
+        this.creerCourbe();
         //this.creerSphere();
     }
 
@@ -180,10 +180,9 @@ class Niveau {
 
 
     /**
-     * Créer le sol
-     * de longeur largeure aléatoire
+     * Créer la courbe
      */
-    creerSol() {
+    creerCourbe() {
         //https://playground.babylonjs.com/#MZ7QRG#6
         //https://playground.babylonjs.com/#MZ7QRG#10
         //Création d'une ligne avec un chemin aléatoire
@@ -221,10 +220,9 @@ class Niveau {
     }
 
     /**
-     * Créer sol 2
-     * 
+     * Créer sol 
     */
-    creerSol2() {
+    creerSol() {
         const ground = BABYLON.MeshBuilder.CreateGround("ground", {height: 10, width: 10, subdivisions: 4});
         //position
         ground.position.y = 0;
