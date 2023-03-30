@@ -6,6 +6,9 @@ window.onload = creerScene;
 
 let configuration;
 
+/**
+ * Creationde la premiere scene
+ */
 function creerScene() {
 
     let canvas = document.getElementById("canvas");  //  Get the canvas element

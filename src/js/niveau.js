@@ -1,5 +1,10 @@
 class Niveau {
-    constructor(configuration) {
+
+      /**
+       * Constructeur
+       * @param {*} configuration 
+       */
+      constructor(configuration) {
       this.configuration = configuration;
       this.tailleSkybox = 1000;
       this.scene = new BABYLON.Scene(configuration.engine);
@@ -7,11 +12,17 @@ class Niveau {
       this.configureAssetManager();
     }
   
+    /**
+     * Configurer tout les eléménts de la scene et recharger régulierement le rendu scene
+     */
     configureAssetManager() {
       this.createElementsScene();
       this.registerRenderLoop();
     }
   
+    /**
+     * creation de la scene
+     */
     createElementsScene() {
       this.camera = this.createCamera();
       this.createLight();
@@ -20,12 +31,19 @@ class Niveau {
       this.createCurveBetweenCubes();
     }
 
+    /**
+     * Boucle de rendu
+     */
     registerRenderLoop() {
         this.configuration.engine.runRenderLoop(() => {
             this.scene.render();
         });
     }
   
+    /**
+     * Création de la caméra
+     * @returns la caméra
+     */
     createCamera() {
       const camera = new BABYLON.FreeCamera("camera", new BABYLON.Vector3(0, 100, 0), this.scene);
       camera.setTarget(BABYLON.Vector3.Zero());
@@ -34,6 +52,10 @@ class Niveau {
       return camera;
     }
   
+    /**
+     * Modification de la camera pour la rendre othographique
+     * @param {*} camera la camera 
+     */
     setOrthographicCamera(camera) {
       camera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
       let distance = 20;
@@ -45,6 +67,10 @@ class Niveau {
       camera.orthoTop = camera.orthoRight * aspect;
     }
   
+    /**
+     * Ajout des controles à la camera
+     * @param {*} camera la camera ou attacher les controles
+     */
     setupCameraControls(camera) {
       var inputMap = {};
       this.scene.actionManager = new BABYLON.ActionManager(this.scene);
@@ -68,6 +94,11 @@ class Niveau {
       });
     }
   
+    /**
+     * Ajout d'un zoom sur la camera
+     * @param {*} pointerInfo information sur le pointeur
+     * @param {*} camera la cemara ou apppliquer le zoom
+     */
     handleCameraZoom(pointerInfo, camera) {
       const delta = pointerInfo.event.deltaY > 0 ? 1 : -1;
       const distance = camera.orthoRight - camera.orthoLeft;
@@ -78,7 +109,13 @@ class Niveau {
       camera.orthoBottom = camera.orthoLeft * aspect;
       camera.orthoTop = camera.orthoRight * aspect;
     }
-  
+
+
+    /**
+    * Ajoutedes controle pour déplacer la caméra
+    * @param {*} inputMap : la map contenant la liste des controles
+    * @param {*} camera : La camera a laquele seront attachés les controles
+    */
     handleCameraMovement(inputMap, camera) {
       if (inputMap["ArrowUp"]) {
         camera.position.z += 0.1;
@@ -94,11 +131,17 @@ class Niveau {
       }
     }
 
+    /**
+     * Création de la lumiere
+     */
     createLight() {
         const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), this.scene);
         light.intensity = 0.7;
     }
         
+    /**
+     * Création de la skybox
+     */
     createSkybox() {
         const skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: this.tailleSkybox }, this.scene);
         const skyboxMaterial = new BABYLON.StandardMaterial("skyBox", this.scene);
@@ -109,24 +152,45 @@ class Niveau {
         skybox.material = skyboxMaterial;
     }
 
-    
-    // Création de la courbe
-    createSpline() {
-        const scene = this.scene;
-        const pointLigne = [
-            new BABYLON.Vector3(-2, 0, -2),
-            new BABYLON.Vector3(-2, 0, 2),
-            new BABYLON.Vector3(2, 0, 2),
-            new BABYLON.Vector3(2, 0, -2)
-        ];
-        const spline = BABYLON.Curve3.CreateCatmullRomSpline(pointLigne, 10, false);
-        const splinePoints = spline.getPoints();
-        const ligne = BABYLON.MeshBuilder.CreateLines("line", {points : splinePoints}, scene);
-        ligne.color = BABYLON.Color3.Magenta();
-        return {spline, splinePoints};
-    }
+    /**
+     * Création d'une courbe aleatoire
+     * @returns  la courbe, les points composants la courbe 
+     */
+        createSpline() {
+          const scene = this.scene;
 
-    // Création des cubes
+          //https://playground.babylonjs.com/#MZ7QRG#6
+          //https://playground.babylonjs.com/#MZ7QRG#10
+          //Création d'une ligne avec un chemin aléatoire
+          let maximumx = 3;
+          let maximumz = 5;
+          let x = 0;
+          let z = 0;
+          let pointLigne = [];
+
+          for (let i = 0; i < 10; i++) {
+            x += Math.random() * maximumx;
+            z += Math.random() * maximumz;
+            z -= Math.random() * maximumz;
+
+            pointLigne.push(new BABYLON.Vector3(x, 0, z));
+          }
+
+
+          const spline = BABYLON.Curve3.CreateCatmullRomSpline(pointLigne, 10, false);
+          const splinePoints = spline.getPoints();
+
+          const ligne = BABYLON.MeshBuilder.CreateLines("line", {points : splinePoints}, scene);
+          ligne.color = BABYLON.Color3.Magenta();
+          console.log("rest");
+          return {spline, splinePoints};
+      }
+
+    /**
+     * Création des cubes
+     * @param {*} splinePoints les points de la courbe
+     * @returns un tableau cotenant les cubes en bout de la courbe
+     */
    createCubes(splinePoints) {
         const scene = this.scene;
         const cube1 = BABYLON.MeshBuilder.CreateBox("cube1", { size: 0.5 }, scene);
@@ -140,7 +204,10 @@ class Niveau {
         return [cube1, cube2];
     }
 
-    // Création de l'animation
+    /** 
+     * Création de l'animation
+     * @param {*} cube le cube à animer
+     */
    createCubeAnimation(cube) {
         const scene = this.scene;
         const animation = new BABYLON.Animation("cubeAnimation", "rotation", 10, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
@@ -160,6 +227,11 @@ class Niveau {
         scene.beginAnimation(cube, 0, 360, true);
     }
 
+    /**
+     * création des spheres qui se déplacent sur la courbe
+     * @param {*} spline la courbe
+     * @param {*} splinePoints Les points qui composent lacourbe
+     */
     createSpheres(spline, splinePoints) {
         for (let i = 0; i < 10; i++) {
             setTimeout(() => {
@@ -169,6 +241,12 @@ class Niveau {
         }
     }
       
+    /**
+     * Creation d'une sphere
+     * @param {*} position position de départ  dela  sphere
+     * @param {*} delay delai avant le départ entre chaque sphere
+     * @returns 
+     */
     createSphere(position, delay) {
         const sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 0.1 }, this.scene);
         sphere.position.copyFrom(position);
@@ -184,6 +262,11 @@ class Niveau {
         return sphere;
     }
     
+    /**
+     * Creation des animation de la sphere
+     * @param {*} sphere la sphere à animer
+     * @param {*} splinePoints les points de la courbe
+     */
     createSphereAnimation(sphere, splinePoints) {
         console.log(splinePoints);
         console.log(sphere);
@@ -207,6 +290,10 @@ class Niveau {
   
 
     // Fonction principale
+    /**
+     * Creation de la courbe 
+     * @param {*} scene la scene ou créer la courbe
+     */
     createCurveBetweenCubes(scene){
         const {spline, splinePoints} = this.createSpline();
         const [cube1, cube2] = this.createCubes(splinePoints);
