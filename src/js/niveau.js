@@ -1,11 +1,21 @@
+import { Chemin } from "./chemin.js";
+import { BasePrincipale } from "./basesPrincipale.js";
+
+/**
+ * Affichage et gestion d'un niveau
+ */
 class Niveau {
 
       /**
        * Constructeur
        * @param {*} configuration 
+       * @param {int} nombreBasesSecondaire : nombre de bases secondaires du niveau
        */
-      constructor(configuration) {
+      constructor(configuration, nombreBasesSecondaire) {
       this.configuration = configuration;
+
+      this.nombreBasesSecondaire = nombreBasesSecondaire;
+
       this.tailleSkybox = 1000;
       this.scene = new BABYLON.Scene(configuration.engine);
       this.configuration.scenes.push(this.scene);
@@ -20,6 +30,11 @@ class Niveau {
       this.registerRenderLoop();
     }
   
+
+
+
+
+
     /**
      * creation de la scene
      */
@@ -27,8 +42,16 @@ class Niveau {
       this.camera = this.createCamera();
       this.createLight();
       this.createSkybox();
-      this.createGround();
-      this.createCurveBetweenCubes();
+
+      this.chemin = new Chemin(this.nombreBasesSecondaire); // creer le chemin
+      
+      this.BasesPrincipales = this.CreerBasesPrincipales(); //créer les bases principales
+
+      //afficher les bases principales
+      this.createCubeAnimation(this.BasesPrincipales[0].cube);
+      this.createCubeAnimation(this.BasesPrincipales[1].cube);
+
+      this.createCurveBetweenCubes(this.chemin.spline, this.chemin.splinePoints);
     }
 
     /**
@@ -40,15 +63,21 @@ class Niveau {
         });
     }
   
+
+
+
+
+
     /**
      * Création de la caméra
      * @returns la caméra
      */
     createCamera() {
-      const camera = new BABYLON.FreeCamera("camera", new BABYLON.Vector3(0, 100, 0), this.scene);
+      const camera = new BABYLON.FreeCamera("camera", new BABYLON.Vector3(0, 300, 0), this.scene);
       camera.setTarget(BABYLON.Vector3.Zero());
       this.setOrthographicCamera(camera);
       this.setupCameraControls(camera);
+      //console.log(camera.position);
       return camera;
     }
   
@@ -76,11 +105,11 @@ class Niveau {
       this.scene.actionManager = new BABYLON.ActionManager(this.scene);
       this.scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyDownTrigger, function (evt) {
         inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
-        console.log(inputMap)
+        //console.log(inputMap)
       }));
       this.scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger, function (evt) {
         inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
-        console.log(inputMap)
+        //console.log(inputMap)
       }));
       this.scene.onPointerObservable.add((pointerInfo) => {
         switch (pointerInfo.type) {
@@ -112,22 +141,22 @@ class Niveau {
 
 
     /**
-    * Ajoutedes controle pour déplacer la caméra
+    * Ajoute des controle pour déplacer la caméra
     * @param {*} inputMap : la map contenant la liste des controles
     * @param {*} camera : La camera a laquele seront attachés les controles
     */
     handleCameraMovement(inputMap, camera) {
       if (inputMap["ArrowUp"]) {
-        camera.position.z += 0.1;
-      }
-      if (inputMap["ArrowDown"]) {
         camera.position.z -= 0.1;
       }
+      if (inputMap["ArrowDown"]) {
+        camera.position.z += 0.1;
+      }
       if (inputMap["ArrowLeft"]) {
-        camera.position.x -= 0.1;
+        camera.position.x += 0.1;
       }
       if (inputMap["ArrowRight"]) {
-        camera.position.x += 0.1;
+        camera.position.x -= 0.1;
       }
     }
 
@@ -152,57 +181,67 @@ class Niveau {
         skybox.material = skyboxMaterial;
     }
 
+
+    // TODO a faire sous forme d'instance
     /**
-     * Création d'une courbe aleatoire
-     * @returns  la courbe, les points composants la courbe 
+     * Création des bases principales
+     * @returns un tableau cotenant les bases principales en bout de la courbe
      */
-        createSpline() {
-          const scene = this.scene;
-
-          //https://playground.babylonjs.com/#MZ7QRG#6
-          //https://playground.babylonjs.com/#MZ7QRG#10
-          //Création d'une ligne avec un chemin aléatoire
-          let maximumx = 3;
-          let maximumz = 5;
-          let x = 0;
-          let z = 0;
-          let pointLigne = [];
-
-          for (let i = 0; i < 10; i++) {
-            x += Math.random() * maximumx;
-            z += Math.random() * maximumz;
-            z -= Math.random() * maximumz;
-
-            pointLigne.push(new BABYLON.Vector3(x, 0, z));
-          }
+    CreerBasesPrincipales() {
+      const splinePoints = this.chemin.splinePoints;
+      let cube1 = new BasePrincipale(splinePoints[0]);
+      let cube2 = new BasePrincipale(splinePoints[splinePoints.length - 1]);
+      return [cube1, cube2];
+  }
 
 
-          const spline = BABYLON.Curve3.CreateCatmullRomSpline(pointLigne, 10, false);
-          const splinePoints = spline.getPoints();
+////////////////////
 
-          const ligne = BABYLON.MeshBuilder.CreateLines("line", {points : splinePoints}, scene);
-          ligne.color = BABYLON.Color3.Magenta();
-          console.log("rest");
-          return {spline, splinePoints};
-      }
+/**
+ * @param {*} splinePoints : les points d'une courbe
+ * @param {int} nombreBasesSecondaire : le nombre de bases secondaires à placer
+ * @returns un tableau contenant les bases secondaires
+ */
 
-    /**
-     * Création des cubes
-     * @param {*} splinePoints les points de la courbe
-     * @returns un tableau cotenant les cubes en bout de la courbe
-     */
-   createCubes(splinePoints) {
-        const scene = this.scene;
-        const cube1 = BABYLON.MeshBuilder.CreateBox("cube1", { size: 0.5 }, scene);
-        cube1.position.copyFrom(splinePoints[0]);
-        cube1.material = new BABYLON.StandardMaterial("cube1Mat", scene);
-        cube1.material.diffuseColor = BABYLON.Color3.Green();
-        const cube2 = BABYLON.MeshBuilder.CreateBox("cube2", { size: 0.5 }, scene);
-        cube2.position.copyFrom(splinePoints[splinePoints.length - 1]);
-        cube2.material = new BABYLON.StandardMaterial("cube2Mat", scene);
-        cube2.material.diffuseColor = BABYLON.Color3.Green();
-        return [cube1, cube2];
+// TODO : a faire sous forme d'instance
+createCylindres(splinePoints, nombreBasesSecondaire) {
+  const scene = this.scene;
+  let basesSecondaires = [];
+  let i = 0;
+  while (i < nombreBasesSecondaire) {
+    let index = Math.floor(Math.random() * splinePoints.length)
+    
+    if(index > 20 || index < splinePoints.length - 20){
+      let pointSelectionne = splinePoints[index];
+      let z = pointSelectionne._z >= 0 ? pointSelectionne._z - 1  : pointSelectionne._z + 1  ;
+      
+      let pointModifie = new BABYLON.Vector3(pointSelectionne._x, 0, z) ;
+      //console.log(pointSelectionne,pointModifie);
+
+      // modifier les coordonnées pour placer la base distance de la ligne
+      const cube = BABYLON.MeshBuilder.CreateBox("cube1", { size: 0.25 }, scene);
+      cube.position = pointModifie;
+
+      //detecter les intersections avec la courbe et les autres tour
+
+
+
+      
+
+      basesSecondaires.push(cube);
+      i++;
     }
+  }
+  //console.log(basesSecondaires);
+  //console.log(this.BasesPrincipales);
+  return basesSecondaires;
+}
+
+
+
+////////////////////////
+
+
 
     /** 
      * Création de l'animation
@@ -268,9 +307,9 @@ class Niveau {
      * @param {*} splinePoints les points de la courbe
      */
     createSphereAnimation(sphere, splinePoints) {
-        console.log(splinePoints);
-        console.log(sphere);
-        const animation = new BABYLON.Animation("sphereAnimation", "position", 15, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+        //console.log(splinePoints);
+        //console.log(sphere);
+        const animation = new BABYLON.Animation("sphereAnimation", "position", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
     
         // Crée une animation de déplacement le long de la courbe
         const keyFrames = [];
@@ -283,7 +322,7 @@ class Niveau {
         animation.setKeys(keyFrames);
     
         sphere.animations.push(animation);
-        this.scene.beginAnimation(sphere, 0, 100, true);
+        this.scene.beginAnimation(sphere, 0, 1000, true);
     }
     
       
@@ -294,25 +333,14 @@ class Niveau {
      * Creation de la courbe 
      * @param {*} scene la scene ou créer la courbe
      */
-    createCurveBetweenCubes(scene){
-        const {spline, splinePoints} = this.createSpline();
-        const [cube1, cube2] = this.createCubes(splinePoints);
-        this.createCubeAnimation(cube1);
-        this.createCubeAnimation(cube2);
+    createCurveBetweenCubes(spline, splinePoints){
+
+        const basesSecondaires = this.createCylindres(splinePoints, this.nombreBasesSecondaire);
+
+
+
         this.createSpheres(spline, splinePoints);
     }
     
-    createGround() {
-         /* Le sol pour les tests et positionner les futurs objets de manières plus précises
-
-        const ground = BABYLON.MeshBuilder.CreateGround("ground", {height: 10, width: 10, subdivisions: 4});
-        //position
-        ground.position.y = 0;
-        ground.position.x = 0;
-        ground.position.z = 0;
-
-        */
-    }
-
 }
 export { Niveau };

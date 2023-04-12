@@ -23,7 +23,7 @@ class SceneParDefaut {
      */
     configureAssetManager() {
 
-        console.log(this.configuration)
+        //console.log(this.configuration)
         var instance = this;
 
         instance.creerElementsScene();  //  Call the createScene function
@@ -107,9 +107,9 @@ class SceneParDefaut {
         btnJouer.background = "blue";
 
         btnJouer.onPointerUpObservable.add(() => {
-            console.log(this.configuration)
+            //console.log(this.configuration)
             this.configuration.createNewEngine();
-            new Niveau(this.configuration);
+            new Niveau(this.configuration,3);
 
         });
         advancedTexture.addControl(btnJouer);
