@@ -1,6 +1,7 @@
 import { Chemin } from "./chemin.js";
 import { BasePrincipale } from "./basesPrincipale.js";
 import { BaseSecondaire } from "./baseSecondaire.js";
+import { InterfaceNiveau } from "./interfaceNiveau.js";
 
 /**
  * Affichage et gestion d'un niveau
@@ -14,14 +15,16 @@ class Niveau {
    */
   constructor(configuration, nombreBasesSecondaire) {
     this.configuration = configuration;
-
     this.nombreBasesSecondaire = nombreBasesSecondaire;
-
     this.tailleSkybox = 1000;
+
     this.scene = new BABYLON.Scene(configuration.engine);
+
+    
     this.configuration.scenes.push(this.scene);
     this.configureAssetManager();
   }
+
 
   /**
    * Configurer tout les eléménts de la scene et recharger régulierement le rendu scene
@@ -30,10 +33,6 @@ class Niveau {
     this.createElementsScene();
     this.registerRenderLoop();
   }
-
-
-
-
 
 
   /**
@@ -60,13 +59,11 @@ class Niveau {
       this.scene.beginAnimation(element.baseMesh, 0, 360, true);
     }
 
-    this.createSpheres(this.chemin.spline, splinePoints); // a retirer , juste un exemple de fonction qui permet au unites de suivre la courb
-    console.log('test');
+    // Interface graphique
+    this.CreerInterface();
+
+    //this.createSpheres(this.chemin.spline, splinePoints);
   }
-
-
-
-
 
 
   /**
@@ -77,10 +74,6 @@ class Niveau {
       this.scene.render();
     });
   }
-
-
-
-
 
 
   /**
@@ -96,6 +89,7 @@ class Niveau {
     return camera;
   }
 
+
   /**
    * Modification de la camera pour la rendre othographique
    * @param {*} camera la camera 
@@ -110,6 +104,7 @@ class Niveau {
     camera.orthoBottom = camera.orthoLeft * aspect;
     camera.orthoTop = camera.orthoRight * aspect;
   }
+
 
   /**
    * Ajout des controles à la camera
@@ -137,6 +132,7 @@ class Niveau {
       this.handleCameraMovement(inputMap, camera);
     });
   }
+
 
   /**
    * Ajout d'un zoom sur la camera
@@ -175,6 +171,7 @@ class Niveau {
     }
   }
 
+
   /**
    * Création de la lumiere
    */
@@ -182,6 +179,7 @@ class Niveau {
     const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), this.scene);
     light.intensity = 0.7;
   }
+
 
   /**
    * Création de la skybox
@@ -232,7 +230,7 @@ class Niveau {
   CreerBasesSecondaires(splinePoints, nombreBasesSecondaire) {
     let basesSecondaires = [];
     let i = 0;
-    const cylindre = BABYLON.MeshBuilder.CreateCylinder("cylinder", { height: 0.30, diameterTop: 0.25, diameterBottom: 0.25});// le cube à clonner
+    const cylindre = BABYLON.MeshBuilder.CreateCylinder("cylinder", { height: 0.30, diameterTop: 0.25, diameterBottom: 0.25 });// le cube à clonner
     cylindre.material = new BABYLON.StandardMaterial("cylindreMat");// Attention quand au passera au couleurs custom voir la fonction create curbe pour éviter de changer tout les clones
     cylindre.material.diffuseColor = BABYLON.Color3.Blue();
 
@@ -271,6 +269,7 @@ class Niveau {
     }
   }
 
+
   /**
    * Creation d'une sphere
    * @param {*} position position de départ  dela  sphere
@@ -292,11 +291,12 @@ class Niveau {
     return sphere;
   }
 
+
   /**
-   * Creation des animation de la sphere
-   * @param {*} sphere la sphere à animer
-   * @param {*} splinePoints les points de la courbe
-   */
+ * Creation des animation de la sphere
+ * @param {*} sphere la sphere à animer
+ * @param {*} splinePoints les points de la courbe
+ */
   createSphereAnimation(sphere, splinePoints) {
     //console.log(splinePoints);
     //console.log(sphere);
@@ -317,21 +317,23 @@ class Niveau {
   }
 
 
-
-
-  // Fonction principale
   /**
-   * Creation de la courbe 
-   * @param {*} scene la scene ou créer la courbe
+   * Creation de l'interface
    */
-  createCurveBetweenCubes(spline, splinePoints) {
-
-    
-
-
-
-    this.createSpheres(spline, splinePoints);
+  CreerInterface() {
+    let advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+    var button1 = BABYLON.GUI.Button.CreateSimpleButton("but1", "Click Me");
+    button1.width = "150px"
+    button1.height = "40px";
+    button1.color = "white";
+    button1.cornerRadius = 20;
+    button1.background = "green";
+    button1.onPointerUpObservable.add(function () {
+      alert("you did it!");
+    });
+    advancedTexture.addControl(button1);
   }
+
 
 }
 export { Niveau };
