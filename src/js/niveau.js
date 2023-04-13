@@ -1,5 +1,6 @@
 import { Chemin } from "./chemin.js";
 import { BasePrincipale } from "./basesPrincipale.js";
+import { BaseSecondaire } from "./baseSecondaire.js";
 
 /**
  * Affichage et gestion d'un niveau
@@ -39,20 +40,34 @@ class Niveau {
    * creation de la scene
    */
   createElementsScene() {
+
     this.camera = this.createCamera();
     this.createLight();
     this.createSkybox();
 
     this.chemin = new Chemin(this.nombreBasesSecondaire); // creer le chemin
+    let splinePoints = this.chemin.splinePoints;
 
-    this.BasesPrincipales = this.CreerBasesPrincipales(); //créer les bases principales
+    // bases principales
+    this.basesPrincipales = this.CreerBasesPrincipales(); //créer les bases principales
+    for (const element of this.basesPrincipales) {
+      this.scene.beginAnimation(element.baseMesh, 0, 360, true); // annimer les bases principales
+    }
 
-    //animer les bases principales
-    this.scene.beginAnimation(this.BasesPrincipales[0].baseMesh, 0, 360, true);
-    this.scene.beginAnimation(this.BasesPrincipales[1].baseMesh, 0, 360, true);
+    // bases secondaires
+    this.basesSecondaires = this.CreerBasesSecondaires(splinePoints, this.nombreBasesSecondaire);
+    for (const element of this.basesSecondaires) {
+      this.scene.beginAnimation(element.baseMesh, 0, 360, true);
+    }
 
-    this.createCurveBetweenCubes(this.chemin.spline, this.chemin.splinePoints);
+    this.createSpheres(this.chemin.spline, splinePoints); // a retirer , juste un exemple de fonction qui permet au unites de suivre la courb
+    console.log('test');
   }
+
+
+
+
+
 
   /**
    * Boucle de rendu
@@ -207,51 +222,39 @@ class Niveau {
   }
 
 
-  ////////////////////
-
   /**
    * @param {*} splinePoints : les points d'une courbe
    * @param {int} nombreBasesSecondaire : le nombre de bases secondaires à placer
    * @returns un tableau contenant les bases secondaires
+   * 
+   * @todo : detecter les intersections avec la courbe et les autres tour
    */
-
-  // TODO : a faire sous forme d'instance
-  createCylindres(splinePoints, nombreBasesSecondaire) {
-    const scene = this.scene;
+  CreerBasesSecondaires(splinePoints, nombreBasesSecondaire) {
     let basesSecondaires = [];
     let i = 0;
+    const cylindre = BABYLON.MeshBuilder.CreateCylinder("cylinder", { height: 0.30, diameterTop: 0.25, diameterBottom: 0.25});// le cube à clonner
+    cylindre.material = new BABYLON.StandardMaterial("cylindreMat");// Attention quand au passera au couleurs custom voir la fonction create curbe pour éviter de changer tout les clones
+    cylindre.material.diffuseColor = BABYLON.Color3.Blue();
+
     while (i < nombreBasesSecondaire) {
-      let index = Math.floor(Math.random() * splinePoints.length)
+      let index = Math.floor(Math.random() * splinePoints.length);
 
       if (index > 20 || index < splinePoints.length - 20) {
         let pointSelectionne = splinePoints[index];
+        // placer le centre de la base secondaire suffisament loin de la courbe
         let z = pointSelectionne._z >= 0 ? pointSelectionne._z - 1 : pointSelectionne._z + 1;
-
         let pointModifie = new BABYLON.Vector3(pointSelectionne._x, 0, z);
-        //console.log(pointSelectionne,pointModifie);
-
-        // modifier les coordonnées pour placer la base distance de la ligne
-        const cube = BABYLON.MeshBuilder.CreateBox("cube1", { size: 0.25 }, scene);
-        cube.position = pointModifie;
-
-        //detecter les intersections avec la courbe et les autres tour
-
-
-
-
-
-        basesSecondaires.push(cube);
+        // clonner le cylyndre modèle et modifier la position
+        let clone = cylindre.clone("baseSecondaire");
+        clone.position = pointModifie;
+        // TODO detecter les intersections avec la courbe et les autres tour et deplacer le cylindre en conséquence
+        basesSecondaires.push(new BaseSecondaire(clone));
         i++;
       }
     }
-    //console.log(basesSecondaires);
-    //console.log(this.BasesPrincipales);
+    cylindre.dispose();
     return basesSecondaires;
   }
-
-
-
-  ////////////////////////
 
 
   /**
@@ -323,7 +326,7 @@ class Niveau {
    */
   createCurveBetweenCubes(spline, splinePoints) {
 
-    const basesSecondaires = this.createCylindres(splinePoints, this.nombreBasesSecondaire);
+    
 
 
 
