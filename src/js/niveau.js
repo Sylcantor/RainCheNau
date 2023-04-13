@@ -48,8 +48,8 @@ class Niveau {
       this.BasesPrincipales = this.CreerBasesPrincipales(); //créer les bases principales
 
       //afficher les bases principales
-      this.createCubeAnimation(this.BasesPrincipales[0].cube);
-      this.createCubeAnimation(this.BasesPrincipales[1].cube);
+      this.createCubeAnimation(this.BasesPrincipales[0].baseMesh);
+      this.createCubeAnimation(this.BasesPrincipales[1].baseMesh);
 
       this.createCurveBetweenCubes(this.chemin.spline, this.chemin.splinePoints);
     }
@@ -189,9 +189,22 @@ class Niveau {
      */
     CreerBasesPrincipales() {
       const splinePoints = this.chemin.splinePoints;
-      let cube1 = new BasePrincipale(splinePoints[0]);
-      let cube2 = new BasePrincipale(splinePoints[splinePoints.length - 1]);
-      return [cube1, cube2];
+
+      // création de la base principale du joueur
+      let cube = BABYLON.MeshBuilder.CreateBox("cube1", { size: 0.5 });
+      cube.position = splinePoints[0];
+      cube.material = new BABYLON.StandardMaterial("cubeMat");
+      cube.material.diffuseColor = BABYLON.Color3.Green(); // à changer quand on modifiera les couleur
+      let basePrincipale1 = new BasePrincipale(cube);
+
+      // création de la base princpale de l'ia
+      let cube2 = cube.clone("cube 2");
+      cube2.position = splinePoints[splinePoints.length - 1];
+      cube2.material = cube.material.clone("cubeMat2");
+      cube2.material.diffuseColor = BABYLON.Color3.Blue();
+      let basePrincipale2 = new BasePrincipale(cube2);
+
+      return [basePrincipale1, basePrincipale2];
   }
 
 
