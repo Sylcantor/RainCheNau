@@ -11,16 +11,14 @@ class Niveau {
   /**
    * Constructeur
    * @param {*} configuration 
-   * @param {int} nombreBasesSecondaire : nombre de bases secondaires du niveau
+   * @param {int} difficulte : la difficulte du niveau à créer
    */
-  constructor(configuration, nombreBasesSecondaire) {
+  constructor(configuration, difficulte) {
     this.configuration = configuration;
-    this.nombreBasesSecondaire = nombreBasesSecondaire;
+    this.difficulte = difficulte;
     this.tailleSkybox = 1000;
-
+    this.nombreBasesSecondaire = difficulte + 1;
     this.scene = new BABYLON.Scene(configuration.engine);
-
-    
     this.configuration.scenes.push(this.scene);
     this.configureAssetManager();
   }
@@ -44,13 +42,14 @@ class Niveau {
     this.createLight();
     this.createSkybox();
 
-    this.chemin = new Chemin(this.nombreBasesSecondaire); // creer le chemin
+     // creer le chemin
+    this.chemin = new Chemin(this.nombreBasesSecondaire);
     let splinePoints = this.chemin.splinePoints;
 
     // bases principales
     this.basesPrincipales = this.CreerBasesPrincipales(); //créer les bases principales
     for (const element of this.basesPrincipales) {
-      this.scene.beginAnimation(element.baseMesh, 0, 360, true); // annimer les bases principales
+      this.scene.beginAnimation(element.baseMesh, 0, 360, true); // animer les bases principales
     }
 
     // bases secondaires
@@ -60,7 +59,7 @@ class Niveau {
     }
 
     // Interface graphique
-    this.CreerInterface();
+    this.interface = new InterfaceNiveau();
 
     //this.createSpheres(this.chemin.spline, splinePoints);
   }
@@ -315,25 +314,5 @@ class Niveau {
     sphere.animations.push(animation);
     this.scene.beginAnimation(sphere, 0, 1000, true);
   }
-
-
-  /**
-   * Creation de l'interface
-   */
-  CreerInterface() {
-    let advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
-    var button1 = BABYLON.GUI.Button.CreateSimpleButton("but1", "Click Me");
-    button1.width = "150px"
-    button1.height = "40px";
-    button1.color = "white";
-    button1.cornerRadius = 20;
-    button1.background = "green";
-    button1.onPointerUpObservable.add(function () {
-      alert("you did it!");
-    });
-    advancedTexture.addControl(button1);
-  }
-
-
 }
 export { Niveau };

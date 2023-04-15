@@ -33,12 +33,12 @@ class Chemin {
         let pointLigne = [];
         pointLigne.push(new BABYLON.Vector3(x, 0, z));
 
-        // + 10 pour que le ligne ne sois pas trop courte et éviter que les bases ne soient trop proche à chaque fois
-        for (let i = 0; i < nombreBasesSecondaire + 10; i++) {
+        // faire un chemin plus long que le nombre de bases secondaire
+        for (let i = 0; i < nombreBasesSecondaire + nombreBasesSecondaire*0.5; i++) {
             //éviter les boucles lors du traçage de la courbe
             x = x > 0 ? x + maximumx : x - maximumx;
             z = x > 0 ? z + maximumz : z - maximumz;
-
+            console.log('12345600');
             //modifier aléatoirement les coordonnées des points
             x -= Math.random() * maximumx / 2;
             z += Math.random() * (maximumz / 2);

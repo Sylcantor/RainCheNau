@@ -109,7 +109,7 @@ class SceneParDefaut {
         btnJouer.onPointerUpObservable.add(() => {
             //console.log(this.configuration)
             this.configuration.createNewEngine();
-            new Niveau(this.configuration,3);
+            new Niveau(this.configuration,0);
 
         });
         advancedTexture.addControl(btnJouer);

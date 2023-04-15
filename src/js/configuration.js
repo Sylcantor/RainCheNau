@@ -1,5 +1,5 @@
 /**
- * Configuration du projet
+ * Configuration du moteur de la scene
  */
 class Configuration{
 
@@ -11,7 +11,6 @@ class Configuration{
         this.canvas = canvas;
         this.engine = new BABYLON.Engine(canvas, true);  //  Generate the BABYLON 3D engine
         this.scenes = []; // Contien toutes les scenes en cours d'utilisation
-        //this.difficulte = 1; // difficulté du niveau a générer
     }
 
     /**
