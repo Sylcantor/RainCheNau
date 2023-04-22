@@ -38,7 +38,7 @@ class Chemin {
             //éviter les boucles lors du traçage de la courbe
             x = x > 0 ? x + maximumx : x - maximumx;
             z = x > 0 ? z + maximumz : z - maximumz;
-            console.log('12345600');
+
             //modifier aléatoirement les coordonnées des points
             x -= Math.random() * maximumx / 2;
             z += Math.random() * (maximumz / 2);

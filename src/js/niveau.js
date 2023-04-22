@@ -18,9 +18,21 @@ class Niveau {
     this.difficulte = difficulte;
     this.tailleSkybox = 1000;
     this.nombreBasesSecondaire = difficulte + 1;
+
+    this.labelNiveau = 1;
+    this.nombreVagueRestante = 2;
+    this.nombreVague = 3;
+    this.temps = 4;
+    this.monnaie = 5;
+
+    // Pas de code apres ça
     this.scene = new BABYLON.Scene(configuration.engine);
+    // Interface graphique
+    this.scene.interface = new InterfaceNiveau(this.labelNiveau, this.nombreVague, this.nombreVagueRestante, this.monnaie);
+
     this.configuration.scenes.push(this.scene);
     this.configureAssetManager();
+
   }
 
 
@@ -42,7 +54,7 @@ class Niveau {
     this.createLight();
     this.createSkybox();
 
-     // creer le chemin
+    // creer le chemin
     this.chemin = new Chemin(this.nombreBasesSecondaire);
     let splinePoints = this.chemin.splinePoints;
 
@@ -58,10 +70,8 @@ class Niveau {
       this.scene.beginAnimation(element.baseMesh, 0, 360, true);
     }
 
-    // Interface graphique
-    this.interface = new InterfaceNiveau();
-
     //this.createSpheres(this.chemin.spline, splinePoints);
+    this.controleScene();
   }
 
 
@@ -114,11 +124,9 @@ class Niveau {
     this.scene.actionManager = new BABYLON.ActionManager(this.scene);
     this.scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyDownTrigger, function (evt) {
       inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
-      //console.log(inputMap)
     }));
     this.scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger, function (evt) {
       inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
-      //console.log(inputMap)
     }));
     this.scene.onPointerObservable.add((pointerInfo) => {
       switch (pointerInfo.type) {
@@ -184,13 +192,13 @@ class Niveau {
    * Création de la skybox
    */
   createSkybox() {
-    const skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: this.tailleSkybox }, this.scene);
+    this.skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: this.tailleSkybox }, this.scene);
     const skyboxMaterial = new BABYLON.StandardMaterial("skyBox", this.scene);
     skyboxMaterial.backFaceCulling = false;
     skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("ressources/images/black_sb/", this.scene);
     skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
     skyboxMaterial.disableLighting = true;
-    skybox.material = skyboxMaterial;
+    this.skybox.material = skyboxMaterial;
   }
 
 
@@ -297,8 +305,6 @@ class Niveau {
  * @param {*} splinePoints les points de la courbe
  */
   createSphereAnimation(sphere, splinePoints) {
-    //console.log(splinePoints);
-    //console.log(sphere);
     const animation = new BABYLON.Animation("sphereAnimation", "position", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
 
     // Crée une animation de déplacement le long de la courbe
@@ -314,5 +320,19 @@ class Niveau {
     sphere.animations.push(animation);
     this.scene.beginAnimation(sphere, 0, 1000, true);
   }
+
+  controleScene() {
+
+    this.scene.onPointerObservable.add((pointerInfo) => {
+      switch (pointerInfo.type) {
+        case BABYLON.PointerEventTypes.POINTERDOWN:
+
+          // Cacher les portées des bases
+          for (const element of this.basesPrincipales) {element.torus.setEnabled(false);}
+          for (const element of this.basesSecondaires) {element.torus.setEnabled(false);}
+      }
+    });
+  }
+
 }
 export { Niveau };
