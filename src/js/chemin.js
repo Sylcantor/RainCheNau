@@ -34,7 +34,7 @@ class Chemin {
         pointLigne.push(new BABYLON.Vector3(x, 0, z));
 
         // faire un chemin plus long que le nombre de bases secondaire
-        for (let i = 0; i < nombreBasesSecondaire + nombreBasesSecondaire*0.5; i++) {
+        for (let i = 0; i < nombreBasesSecondaire + nombreBasesSecondaire*0.5 + 2; i++) {
             //éviter les boucles lors du traçage de la courbe
             x = x > 0 ? x + maximumx : x - maximumx;
             z = x > 0 ? z + maximumz : z - maximumz;

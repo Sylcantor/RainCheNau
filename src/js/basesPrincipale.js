@@ -6,11 +6,11 @@ import { BaseAbstract } from "./baseAbstract.js";
 class BasePrincipale extends BaseAbstract{
     /**
     * Constructeur
-    * @param {BABYLON.Mesh} baseMesh Messh associé à la base
+    * @param {BABYLON.Mesh} baseMesh Mesh associé à la base
     */
-    constructor(baseMesh) {
+    constructor(baseMesh, joueur) {
         //Statistiques
-        super(baseMesh, 25, 2, 1, 1);
+        super(baseMesh,joueur , 25, 2, 1, 1);
 
     }
     //maj des stat en fonction de la difficulté du niveau

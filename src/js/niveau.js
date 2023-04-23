@@ -2,6 +2,8 @@ import { Chemin } from "./chemin.js";
 import { BasePrincipale } from "./basesPrincipale.js";
 import { BaseSecondaire } from "./baseSecondaire.js";
 import { InterfaceNiveau } from "./interfaceNiveau.js";
+import { Joueur } from "./joueur.js";
+import { TypeJoueur } from "./typeJoueur.js";
 
 /**
  * Affichage et gestion d'un niveau
@@ -24,9 +26,11 @@ class Niveau {
     this.nombreVague = 3;
     this.temps = 4;
     this.monnaie = 5;
+    this.joueurs = [new Joueur(TypeJoueur.Joueur), new Joueur(TypeJoueur.Ia)];
 
-    // Pas de code apres ça
+
     this.scene = new BABYLON.Scene(configuration.engine);
+    this.gl = new BABYLON.GlowLayer("glow"); //permet de faire briller les mesh des bases
     // Interface graphique
     this.scene.interface = new InterfaceNiveau(this.labelNiveau, this.nombreVague, this.nombreVagueRestante, this.monnaie);
 
@@ -60,14 +64,14 @@ class Niveau {
 
     // bases principales
     this.basesPrincipales = this.CreerBasesPrincipales(); //créer les bases principales
-    for (const element of this.basesPrincipales) {
-      this.scene.beginAnimation(element.baseMesh, 0, 360, true); // animer les bases principales
-    }
 
     // bases secondaires
-    this.basesSecondaires = this.CreerBasesSecondaires(splinePoints, this.nombreBasesSecondaire);
-    for (const element of this.basesSecondaires) {
+     this.basesSecondaires = this.CreerBasesSecondaires(splinePoints, this.nombreBasesSecondaire);
+
+    // annimation de toutes les bases
+    for (const element of this.basesPrincipales.concat(this.basesSecondaires)) {
       this.scene.beginAnimation(element.baseMesh, 0, 360, true);
+      this.gl.addIncludedOnlyMesh(element.baseMesh);
     }
 
     //this.createSpheres(this.chemin.spline, splinePoints);
@@ -94,7 +98,6 @@ class Niveau {
     camera.setTarget(BABYLON.Vector3.Zero());
     this.setOrthographicCamera(camera);
     this.setupCameraControls(camera);
-    //console.log(camera.position);
     return camera;
   }
 
@@ -212,16 +215,12 @@ class Niveau {
     // création de la base principale du joueur
     let cube = BABYLON.MeshBuilder.CreateBox("cube1", { size: 0.5 });
     cube.position = splinePoints[0];
-    cube.material = new BABYLON.StandardMaterial("cubeMat");
-    cube.material.diffuseColor = BABYLON.Color3.Green(); // à changer quand on modifiera les couleur
-    let basePrincipale1 = new BasePrincipale(cube);
+    let basePrincipale1 = new BasePrincipale(cube, this.joueurs[0]);
 
     // création de la base princpale de l'ia
     let cube2 = cube.clone("cube 2");
     cube2.position = splinePoints[splinePoints.length - 1];
-    cube2.material = cube.material.clone("cubeMat2");
-    cube2.material.diffuseColor = BABYLON.Color3.Blue();
-    let basePrincipale2 = new BasePrincipale(cube2);
+    let basePrincipale2 = new BasePrincipale(cube2,this.joueurs[1]);
 
     return [basePrincipale1, basePrincipale2];
   }
@@ -238,22 +237,25 @@ class Niveau {
     let basesSecondaires = [];
     let i = 0;
     const cylindre = BABYLON.MeshBuilder.CreateCylinder("cylinder", { height: 0.30, diameterTop: 0.25, diameterBottom: 0.25 });// le cube à clonner
-    cylindre.material = new BABYLON.StandardMaterial("cylindreMat");// Attention quand au passera au couleurs custom voir la fonction create curbe pour éviter de changer tout les clones
-    cylindre.material.diffuseColor = BABYLON.Color3.Blue();
+    //cylindre.material = new BABYLON.StandardMaterial("cylindreMat");// Attention quand au passera au couleurs custom voir la fonction create curbe pour éviter de changer tout les clones
+    //cylindre.material.diffuseColor = BABYLON.Color3.Blue();
 
     while (i < nombreBasesSecondaire) {
       let index = Math.floor(Math.random() * splinePoints.length);
 
       if (index > 20 || index < splinePoints.length - 20) {
         let pointSelectionne = splinePoints[index];
+
         // placer le centre de la base secondaire suffisament loin de la courbe
         let z = pointSelectionne._z >= 0 ? pointSelectionne._z - 1 : pointSelectionne._z + 1;
         let pointModifie = new BABYLON.Vector3(pointSelectionne._x, 0, z);
+
         // clonner le cylyndre modèle et modifier la position
         let clone = cylindre.clone("baseSecondaire");
         clone.position = pointModifie;
+
         // TODO detecter les intersections avec la courbe et les autres tour et deplacer le cylindre en conséquence
-        basesSecondaires.push(new BaseSecondaire(clone));
+        basesSecondaires.push(new BaseSecondaire(clone,this.joueurs[1]));
         i++;
       }
     }

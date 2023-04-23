@@ -8,18 +8,23 @@ class BaseAbstract {
      * @param {int} portee portée de départ de la base
      * @param {int} vitesseAttaque vitesse d'attaque de départ de la base
      */
-    constructor(baseMesh, pv, attaque, portee, vitesseAttaque) {
+    constructor(baseMesh, joueur, pv, attaque, portee, vitesseAttaque) {
+        this.joueur = joueur;
         this.baseMesh = baseMesh;
+        this.baseMesh.material = new BABYLON.StandardMaterial("Mat");
+        this.baseMesh.material.diffuseColor = this.joueur.couleur;
+        this.baseMesh.material.emissiveColor = this.joueur.couleur;
+        console.log(this.joueur.couleur);
+
         this.pvmax = pv;
         this.pv = pv;
         this.attaque = attaque;
         this.portee = portee;
         this.vitesseAttaque = vitesseAttaque;
 
-        this.torus = BABYLON.MeshBuilder.CreateTorus("torus", {thickness: 0.01, diameter: this.portee, tessellation : 32});
-        this.torus.position =  baseMesh.position;
-        this.torus.setEnabled(false); 
-        
+        this.torus = BABYLON.MeshBuilder.CreateTorus("torus", { thickness: 0.01, diameter: this.portee, tessellation: 32 });
+        this.torus.position = baseMesh.position;
+        this.torus.setEnabled(false);
 
         this.baseMesh.actionManager = new BABYLON.ActionManager();
 
@@ -56,9 +61,10 @@ class BaseAbstract {
 
     // Over/Out
     // Prise dans https://playground.babylonjs.com/#J19GYK#0
-    BaseOverAndOut () {
+    BaseOverAndOut() {
         this.baseMesh.actionManager.registerAction(new BABYLON.SetValueAction(BABYLON.ActionManager.OnPointerOutTrigger, this.baseMesh.material, "emissiveColor", this.baseMesh.material.emissiveColor));
         this.baseMesh.actionManager.registerAction(new BABYLON.SetValueAction(BABYLON.ActionManager.OnPointerOverTrigger, this.baseMesh.material, "emissiveColor", BABYLON.Color3.White()));
+        
         this.baseMesh.actionManager.registerAction(new BABYLON.InterpolateValueAction(BABYLON.ActionManager.OnPointerOutTrigger, this.baseMesh, "scaling", new BABYLON.Vector3(1, 1, 1), 150));
         this.baseMesh.actionManager.registerAction(new BABYLON.InterpolateValueAction(BABYLON.ActionManager.OnPointerOverTrigger, this.baseMesh, "scaling", new BABYLON.Vector3(1.1, 1.1, 1.1), 150));
     }
@@ -72,7 +78,7 @@ class BaseAbstract {
                 function (evt) {
                     let base = this.getTriggerParameter().base;
                     base.baseMesh._scene.interface.MAJPanneauDescription(base);
-                    base.torus.setEnabled(true); 
+                    base.torus.setEnabled(true);
                 }));
     }
 }
