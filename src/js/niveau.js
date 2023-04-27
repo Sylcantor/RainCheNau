@@ -67,7 +67,7 @@ class Niveau {
     this.basesPrincipales = this.CreerBasesPrincipales(); //créer les bases principales
 
     // bases secondaires
-    this.basesSecondaires = this.CreerBasesSecondaires(splinePoints, this.nombreBasesSecondaire);
+    this.basesSecondaires = this.CreerBasesSecondaires();
 
 
     this.effeScene();
@@ -203,7 +203,7 @@ class Niveau {
 
   /**
    * Création des bases principales
-   * @returns un tableau contenant les bases principales en bout de la courbe
+   * @returns {BasePrincipale} un tableau contenant les bases principales en bout de la courbe
    */
   CreerBasesPrincipales() {
     const splinePoints = this.chemin.splinePoints;
@@ -225,22 +225,19 @@ class Niveau {
 
 
   /**
-   * @param {*} splinePoints : les points d'une courbe
-   * @param {int} nombreBasesSecondaire : le nombre de bases secondaires à placer
-   * @returns un tableau contenant les bases secondaires
-   * @todo : detecter les intersections avec la courbe et les autres tour
+   * @returns {BaseSecondaire[]} un tableau contenant les bases secondaires
    */
-  CreerBasesSecondaires(splinePoints, nombreBasesSecondaire) {
+  CreerBasesSecondaires() {
     let basesSecondaires = [];
     let i = 0;
     let cylindre = BABYLON.MeshBuilder.CreateCylinder("cylinder", { height: 0.20, diameterTop: 0.25, diameterBottom: 0.25 });// le cube à clonner
     cylindre.material = new BABYLON.StandardMaterial("MatBS1");
 
     // points utilisables
-    let pointsDispos = splinePoints.slice();
+    let pointsDispos = this.chemin.splinePoints.slice();
     pointsDispos.splice(0, 10);
     pointsDispos.splice(-10, 10);
-    while (i < nombreBasesSecondaire) {
+    while (i < this.nombreBasesSecondaire) {
 
       let index = Math.floor(Math.random() * pointsDispos.length);
       let pointSelectionne = pointsDispos[index];
@@ -292,22 +289,22 @@ class Niveau {
   * ajoutes des controles à la scene
   */
   controlScene() {
-
     //Bouton attaquer
     let panel = this.scene.interface.advancedTexture.getDescendants(true, control => control.name === 'BarreInfo')[0];
     panel.getChildByName("btnLancerVague").onPointerUpObservable.add(() => this.CreerVague());
-
-
   }
 
   /**
-   * lance une vague
+   * Creation et lancement d'une vague
    */
   CreerVague() {
     let unites = [];
     let temps = 1000 ; /** @Todo A modifier quand le timer sera mis en place */
 
-    // creation du mesh de l'unité // A replacer par le bon mesh quand implémaentionde générations des unités à partie des bases
+    // creation du mesh de l'unité
+    /**
+     * @todo A replacer par le bon mesh quand implémentation de générations des unités à partie des bases
+     */
     let modele = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 0.1 });
     modele.material = new BABYLON.StandardMaterial("sphereMat");
     modele.position.copyFrom(this.chemin.splinePoints[0]);
@@ -318,45 +315,18 @@ class Niveau {
       let unit = new UniteDefaut(unitMesh, this.joueurs[0]);
       unites.push(unit);
     }
-
-
     
     let i = 0 // permet de décaler le début de l'animation pour chaque sphere 
     for (const element of unites) {
-      //animation du déplacement de l'unité et de la portée
-      let animation = this.creerUniteAnimation(i,element.vitesse);
-
       // Faire se déplacer l'unite et faire suivre la portée
-      element.uniteMesh.animations.push(animation);
-      element.portee.porteeMesh.animations.push(animation);
+      element.uniteMesh.animations.push(element.creerUniteAnimation(i,this.chemin.splinePoints));
+      element.portee.porteeMesh.animations.push( element.uniteMesh.animations[0].clone());
 
+      //element.portee.porteeMesh.setEnabled(true); //test pour voir si la portée suis le mesh
       this.scene.beginAnimation(element.uniteMesh, 0, temps, false);
       this.scene.beginAnimation(element.portee.porteeMesh, 0, temps, false);
-
       i += 0.1;
     }
-
-
-
-  }
-
-  /**
- * Creation des animation l'unité en fonction de sa vitesse
- */
-  creerUniteAnimation(depart, vitesse) {
-    const animation = new BABYLON.Animation("deplacementChemin", "position", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
-
-    //Crée une animation de déplacement le long de la courbe
-    const keyFrames = [];
-    this.chemin.splinePoints.forEach((point, i) => {
-      (i == 0) ?
-        keyFrames.push({ frame: i, value: point, }) :
-        keyFrames.push({ frame: (i + depart) * 10 / vitesse , value: point, }); // implique vitesse max des unités = 10 
-    });
-
-
-    animation.setKeys(keyFrames);
-    return animation;
   }
 
 }

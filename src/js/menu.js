@@ -58,7 +58,6 @@ class SceneParDefaut {
      * Creer la skybox
      */
     creerSkybox() {
-        // Skybox
         var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 1000.0 }, this.scene);
         var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", this.scene);
         skyboxMaterial.backFaceCulling = false;
@@ -73,11 +72,8 @@ class SceneParDefaut {
      * Créer la camera (obligatoire dans toutes les scenes)
      */
     creerCamera() {
-        // This creates and positions a free camera (non-mesh)
         const camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), this.scene);
-        // This targets the camera to scene origin
         camera.setTarget(BABYLON.Vector3.Zero());
-        // This attaches the camera to the canvas
         camera.attachControl(canvas, true);
     }
 
@@ -86,9 +82,7 @@ class SceneParDefaut {
      * Créer la lumiere
      */
     creerLumiere() {
-        // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
         const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), this.scene);
-        // Default intensity is 1. Let's dim the light a small amount
         light.intensity = 0.7;
     }
 
@@ -96,7 +90,6 @@ class SceneParDefaut {
      * Créer l'interface graphique
      */
     creerInterface() {
-        // GUI
         var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
         var btnJouer = BABYLON.GUI.Button.CreateSimpleButton("btnJouer", "jouer");

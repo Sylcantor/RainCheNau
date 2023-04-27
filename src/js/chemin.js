@@ -21,9 +21,10 @@ class Chemin {
 
 
     /**
-    * Création d'une courbe aleatoire version 1 
-    * @returns  la courbe
-    */
+     * Création d'une courbe aleatoire version 1 
+     * @param {int} nombreBasesSecondaire : nombre de bases secondaires
+     * @returns {BABYLON.Curve3.CreateCatmullRomSpline} la courbe générée
+     */
     creerCourbeV1(nombreBasesSecondaire) {
         //Création d'une ligne avec un chemin aléatoire
         let maximumx = 1;
@@ -34,7 +35,6 @@ class Chemin {
         pointLigne.push(new BABYLON.Vector3(x, 0, z));
 
         // faire un chemin plus long que le nombre de bases secondaire
-        //for (let i = 0; i < nombreBasesSecondaire ; i++) {
         for (let i = 0; i < nombreBasesSecondaire + nombreBasesSecondaire*0.5 + 2; i++) {
             //éviter les boucles lors du traçage de la courbe
             x = x > 0 ? x + maximumx : x - maximumx;

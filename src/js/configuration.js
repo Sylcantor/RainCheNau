@@ -15,6 +15,7 @@ class Configuration{
 
     /**
      * Efface la scene et le moteur
+     * crée un nouveau moteur
      */
     createNewEngine(){
         this.scenes[0].dispose(); // effacer la premiere scene

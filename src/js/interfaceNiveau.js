@@ -38,7 +38,7 @@ class InterfaceNiveau {
    * @param {string} texte : texte afficher sur le bouton
    * @param {string} top : decalage par rapport au haut de l'écran
    * @param {string} left : decalage par rapport à la gauche de l'écran
-   * @returns un bouton
+   * @returns {BABYLON.GUI.Button} un bouton
    */
   CreerBouton(nom, texte, top, left) {
     let button = BABYLON.GUI.Button.CreateSimpleButton(nom, texte);
@@ -110,7 +110,7 @@ class InterfaceNiveau {
    * Crée un label
    * @param {String} nomLabel : nom du label
    * @param {String} texte : texte du label
-   * @returns un label
+   * @returns {BABYLON.GUI.TextBlock} un label
    */
   CreerLabel(nomLabel, texte) {
     var label = new BABYLON.GUI.TextBlock(nomLabel, "");
@@ -128,7 +128,7 @@ class InterfaceNiveau {
    * @param {String} texte : texte du label
    * @param {int} top : decalage par rapport au haut de l'écran
    * @param {int} left : decalage par rapport à la gauche de l'écran
-   * @returns Le conteneur avec le label associé
+   * @returns {BABYLON.GUI.Rectangle} Le conteneur avec le label associé
    */
   CreerLabelEtConteneur(nomLabel, texte, top, left) {
     var label = this.CreerLabel(nomLabel, texte);
@@ -156,7 +156,7 @@ class InterfaceNiveau {
 
   /**
    * Creer le panneau de description de la selectionnée
-   * @todo : moyen de cacher/afficher le panneau
+   * @todo : moyen de cacher/afficher le panneau (pas prioritaire)
    */
   CreerPanneauDescription() {
 
@@ -197,14 +197,11 @@ class InterfaceNiveau {
    * @param {BaseAbstract} base : base
    */
   MAJPanneauDescription(base) {
-
-    // probablement a changer quand on voudra lancer les vages et don prendre toutes les infos sur le base
-    
     let panel = this.advancedTexture.getDescendants(true, control => control.name === 'BarreInfo')[0];
 
     panel.getChildByName("Selection").text = "base de : " + base.joueur.type.type;
     panel.getChildByName("Pv").text = "Pv: " + base.pv + " / " + base.pvmax;
-    panel.getChildByName("Portee").text = "Portée: " + base.portee;
+    panel.getChildByName("Portee").text = "Portée: " + base.porteeStat;
     panel.getChildByName("VitAtk").text = "Vitesse attaque: " + base.vitesseAttaque;
     panel.getChildByName("Atk").text = "Attaque: " + base.attaque;
 

@@ -7,7 +7,7 @@ window.onload = creerScene;
 let configuration;
 
 /**
- * Creationde la premiere scene
+ * Creation de la premiere scene
  */
 function creerScene() {
 

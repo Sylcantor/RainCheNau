@@ -1,4 +1,8 @@
 import { Portee } from "./portee.js";
+
+/**
+ * Code commun à toutes les bases
+ */
 class BaseAbstract {
 
     /**
@@ -11,7 +15,7 @@ class BaseAbstract {
      */
     constructor(baseMesh, joueur, pv, attaque, portee, vitesseAttaque) {
         this.joueur = joueur;
-        
+
         this.baseMesh = baseMesh;
         this.baseMesh.material.diffuseColor = this.joueur.couleur;
         this.baseMesh.material.emissiveColor = this.joueur.couleur;
@@ -19,7 +23,7 @@ class BaseAbstract {
         this.pvmax = pv;
         this.pv = pv;
         this.attaque = attaque;
-        this.portee = portee;
+        this.porteeStat = portee;
         this.vitesseAttaque = vitesseAttaque;
 
         //le tore est juste pour montrer la portee. 
@@ -56,7 +60,6 @@ class BaseAbstract {
         }
         animation.setKeys(keyFrames);
         this.baseMesh.animations.push(animation);
-
     }
 
 
@@ -65,16 +68,22 @@ class BaseAbstract {
     //emplacements
     //détecton des unités
 
-    // Over/Out
-    // Prise dans https://playground.babylonjs.com/#J19GYK#0
+
+    /**
+     * Animation au passage de la souris sur la base
+     * Prise dans https://playground.babylonjs.com/#J19GYK#0
+     */
     BaseOverAndOut() {
         this.baseMesh.actionManager.registerAction(new BABYLON.SetValueAction(BABYLON.ActionManager.OnPointerOutTrigger, this.baseMesh.material, "emissiveColor", this.baseMesh.material.emissiveColor));
         this.baseMesh.actionManager.registerAction(new BABYLON.SetValueAction(BABYLON.ActionManager.OnPointerOverTrigger, this.baseMesh.material, "emissiveColor", BABYLON.Color3.White()));
-        
+
         this.baseMesh.actionManager.registerAction(new BABYLON.InterpolateValueAction(BABYLON.ActionManager.OnPointerOutTrigger, this.baseMesh, "scaling", new BABYLON.Vector3(1, 1, 1), 150));
         this.baseMesh.actionManager.registerAction(new BABYLON.InterpolateValueAction(BABYLON.ActionManager.OnPointerOverTrigger, this.baseMesh, "scaling", new BABYLON.Vector3(1.1, 1.1, 1.1), 150));
     }
 
+    /**
+     * Animation au click de la souris sur la base
+     */
     SeletionBase() {
         this.baseMesh.actionManager.registerAction(
             new BABYLON.ExecuteCodeAction({
