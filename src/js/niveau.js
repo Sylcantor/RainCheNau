@@ -328,9 +328,10 @@ class Niveau {
 
       // Faire se déplacer l'unite et faire suivre la portée
       element.uniteMesh.animations.push(animation);
-      element.porteeMesh.animations.push(animation);
+      element.portee.porteeMesh.animations.push(animation);
+
       this.scene.beginAnimation(element.uniteMesh, 0, temps, false);
-      this.scene.beginAnimation(element.porteeMesh, 0, temps, false);
+      this.scene.beginAnimation(element.portee.porteeMesh, 0, temps, false);
 
       i += 0.1;
     }

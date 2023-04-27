@@ -1,3 +1,4 @@
+import { Portee } from "./portee.js";
 class UniteAbastract {
 
     /**
@@ -23,11 +24,7 @@ class UniteAbastract {
         this.vitesseAttaque = vitesseAttaque;
         this.vitesse = vitesse; // viesse max = 10, à prendre en compte lors des amélioration, si il est atteint bonus sur les autres stats ?
 
-
-        this.porteeMesh = BABYLON.MeshBuilder.CreateCylinder("portee", { diameter : portee, height: 0.01, tessellation: 32});
-        this.porteeMesh.position = uniteMesh.position;
-        this.porteeMesh.setEnabled(false);
-
+        this.portee = new Portee(portee, uniteMesh.position);
 
         this.uniteMesh.actionManager = new BABYLON.ActionManager();
 

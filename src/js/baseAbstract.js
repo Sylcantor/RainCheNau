@@ -1,3 +1,4 @@
+import { Portee } from "./portee.js";
 class BaseAbstract {
 
     /**
@@ -27,10 +28,7 @@ class BaseAbstract {
         this.torus.position = baseMesh.position;
         this.torus.setEnabled(false);
 
-        this.porteeMesh = BABYLON.MeshBuilder.CreateCylinder("portee", { diameter : portee, height: 0.01, tessellation: 32});
-        this.porteeMesh.position = baseMesh.position;
-        this.porteeMesh.setEnabled(false);
-
+        this.portee = new Portee(portee, baseMesh.position);
 
         this.baseMesh.actionManager = new BABYLON.ActionManager();
 
@@ -60,6 +58,8 @@ class BaseAbstract {
         this.baseMesh.animations.push(animation);
 
     }
+
+
     //maj des stat en fonction de la difficulté du niveau
     //maj des stat chaque tours
     //emplacements
