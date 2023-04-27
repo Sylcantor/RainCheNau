@@ -11,7 +11,7 @@ class BasePrincipale extends BaseAbstract{
     constructor(baseMesh, joueur) {
         //Statistiques
         super(baseMesh,joueur , 25, 2, 1, 1);
-
+        this.baseMesh.showBoundingBox = true;
     }
     //maj des stat en fonction de la difficulté du niveau
     //maj des stat chaque tours

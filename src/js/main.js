@@ -20,5 +20,5 @@ function creerScene() {
 
 // Watch for browser/canvas resize events
 window.addEventListener("resize", () => {
-    configuration.engine.resize()
+    configuration.engine.resize();
 });

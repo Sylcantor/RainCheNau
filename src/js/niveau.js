@@ -4,6 +4,7 @@ import { BaseSecondaire } from "./baseSecondaire.js";
 import { InterfaceNiveau } from "./interfaceNiveau.js";
 import { Joueur } from "./joueur.js";
 import { TypeJoueur } from "./typeJoueur.js";
+import { UniteDefaut } from "./uniteDefaut.js";
 
 /**
  * Affichage et gestion d'un niveau
@@ -66,16 +67,11 @@ class Niveau {
     this.basesPrincipales = this.CreerBasesPrincipales(); //créer les bases principales
 
     // bases secondaires
-     this.basesSecondaires = this.CreerBasesSecondaires(splinePoints, this.nombreBasesSecondaire);
+    this.basesSecondaires = this.CreerBasesSecondaires(splinePoints, this.nombreBasesSecondaire);
 
-    // annimation de toutes les bases
-    for (const element of this.basesPrincipales.concat(this.basesSecondaires)) {
-      this.scene.beginAnimation(element.baseMesh, 0, 360, true);
-      this.gl.addIncludedOnlyMesh(element.baseMesh);
-    }
 
-    //this.createSpheres(this.chemin.spline, splinePoints);
-    this.controleScene();
+    this.effeScene();
+    this.controlScene()
   }
 
 
@@ -213,14 +209,16 @@ class Niveau {
     const splinePoints = this.chemin.splinePoints;
 
     // création de la base principale du joueur
-    let cube = BABYLON.MeshBuilder.CreateBox("cube1", { size: 0.5 });
+    let cube = BABYLON.MeshBuilder.CreateBox("BP1", { size: 0.5 });
     cube.position = splinePoints[0];
+    cube.material = new BABYLON.StandardMaterial("MatBP1");
     let basePrincipale1 = new BasePrincipale(cube, this.joueurs[0]);
 
     // création de la base princpale de l'ia
-    let cube2 = cube.clone("cube 2");
+    let cube2 = cube.clone("BP1");
+    cube2.material = cube.material.clone("MatBP2");
     cube2.position = splinePoints[splinePoints.length - 1];
-    let basePrincipale2 = new BasePrincipale(cube2,this.joueurs[1]);
+    let basePrincipale2 = new BasePrincipale(cube2, this.joueurs[1]);
 
     return [basePrincipale1, basePrincipale2];
   }
@@ -230,110 +228,134 @@ class Niveau {
    * @param {*} splinePoints : les points d'une courbe
    * @param {int} nombreBasesSecondaire : le nombre de bases secondaires à placer
    * @returns un tableau contenant les bases secondaires
-   * 
    * @todo : detecter les intersections avec la courbe et les autres tour
    */
   CreerBasesSecondaires(splinePoints, nombreBasesSecondaire) {
     let basesSecondaires = [];
     let i = 0;
-    const cylindre = BABYLON.MeshBuilder.CreateCylinder("cylinder", { height: 0.30, diameterTop: 0.25, diameterBottom: 0.25 });// le cube à clonner
-    //cylindre.material = new BABYLON.StandardMaterial("cylindreMat");// Attention quand au passera au couleurs custom voir la fonction create curbe pour éviter de changer tout les clones
-    //cylindre.material.diffuseColor = BABYLON.Color3.Blue();
+    let cylindre = BABYLON.MeshBuilder.CreateCylinder("cylinder", { height: 0.20, diameterTop: 0.25, diameterBottom: 0.25 });// le cube à clonner
+    cylindre.material = new BABYLON.StandardMaterial("MatBS1");
 
+    // points utilisables
+    let pointsDispos = splinePoints.slice();
+    pointsDispos.splice(0, 10);
+    pointsDispos.splice(-10, 10);
     while (i < nombreBasesSecondaire) {
-      let index = Math.floor(Math.random() * splinePoints.length);
 
-      if (index > 20 || index < splinePoints.length - 20) {
-        let pointSelectionne = splinePoints[index];
+      let index = Math.floor(Math.random() * pointsDispos.length);
+      let pointSelectionne = pointsDispos[index];
 
-        // placer le centre de la base secondaire suffisament loin de la courbe
-        let z = pointSelectionne._z >= 0 ? pointSelectionne._z - 1 : pointSelectionne._z + 1;
-        let pointModifie = new BABYLON.Vector3(pointSelectionne._x, 0, z);
+      // placer le centre de la base secondaire suffisament loin de la courbe
+      let z = pointSelectionne._z >= 0 ? pointSelectionne._z - 0.5 : pointSelectionne._z + 0.5;
+      let pointModifie = new BABYLON.Vector3(pointSelectionne._x, 0, z);
 
-        // clonner le cylyndre modèle et modifier la position
-        let clone = cylindre.clone("baseSecondaire");
-        clone.position = pointModifie;
+      // clonner le cylyndre modèle et modifier la position
+      let clone = cylindre.clone("baseSecondaire" + i);
+      clone.material = new BABYLON.StandardMaterial("MatBS" + i);
+      clone.position = pointModifie;
 
-        // TODO detecter les intersections avec la courbe et les autres tour et deplacer le cylindre en conséquence
-        basesSecondaires.push(new BaseSecondaire(clone,this.joueurs[1]));
-        i++;
-      }
+      // retirer les points trop proches de la nouvelle base
+      let index5Avant = (index - 5 < 0) ? 0 : index - 5;
+      pointsDispos.splice(index5Avant, 10); // enlever pts avant
+
+      basesSecondaires.push(new BaseSecondaire(clone, this.joueurs[1]));
+      i++;
     }
     cylindre.dispose();
     return basesSecondaires;
   }
 
 
+
+
   /**
-   * création des spheres qui se déplacent sur la courbe
-   * @param {*} spline la courbe
-   * @param {*} splinePoints Les points qui composent lacourbe
+   * Ajoutes des effets au elements de la scene
    */
-  createSpheres(spline, splinePoints) {
-    for (let i = 0; i < 10; i++) {
-      setTimeout(() => {
-        const sphere = this.createSphere(splinePoints[0], i * 30);
-        this.createSphereAnimation(sphere, splinePoints);
-      }, i * 30);
+  effeScene() {
+    // annimation de toutes les bases
+    for (const element of this.basesPrincipales.concat(this.basesSecondaires)) {
+      this.scene.beginAnimation(element.baseMesh, 0, 360, true);
+      this.gl.addIncludedOnlyMesh(element.baseMesh);
     }
-  }
 
-
-  /**
-   * Creation d'une sphere
-   * @param {*} position position de départ  dela  sphere
-   * @param {*} delay delai avant le départ entre chaque sphere
-   * @returns 
-   */
-  createSphere(position, delay) {
-    const sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 0.1 }, this.scene);
-    sphere.position.copyFrom(position);
-    sphere.position.y += 0.1;
-    sphere.material = new BABYLON.StandardMaterial("sphereMat", this.scene);
-    sphere.material.diffuseColor = BABYLON.Color3.Yellow();
-
-    // Ajoute un délai pour que chaque sphère commence à se déplacer à un moment différent
-    setTimeout(() => {
-      sphere.isVisible = true;
-    }, delay);
-
-    return sphere;
-  }
-
-
-  /**
- * Creation des animation de la sphere
- * @param {*} sphere la sphere à animer
- * @param {*} splinePoints les points de la courbe
- */
-  createSphereAnimation(sphere, splinePoints) {
-    const animation = new BABYLON.Animation("sphereAnimation", "position", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
-
-    // Crée une animation de déplacement le long de la courbe
-    const keyFrames = [];
-    splinePoints.forEach((point, i) => {
-      keyFrames.push({
-        frame: i,
-        value: point,
-      });
-    });
-    animation.setKeys(keyFrames);
-
-    sphere.animations.push(animation);
-    this.scene.beginAnimation(sphere, 0, 1000, true);
-  }
-
-  controleScene() {
-
+    // Cacher/afficher les portées des bases
     this.scene.onPointerObservable.add((pointerInfo) => {
       switch (pointerInfo.type) {
         case BABYLON.PointerEventTypes.POINTERDOWN:
-
-          // Cacher les portées des bases
-          for (const element of this.basesPrincipales) {element.torus.setEnabled(false);}
-          for (const element of this.basesSecondaires) {element.torus.setEnabled(false);}
+          for (const element of this.basesPrincipales) { element.torus.setEnabled(false); }
+          for (const element of this.basesSecondaires) { element.torus.setEnabled(false); }
       }
     });
+  }
+
+  /**
+  * ajoutes des controles à la scene
+  */
+  controlScene() {
+
+    //Bouton attaquer
+    let panel = this.scene.interface.advancedTexture.getDescendants(true, control => control.name === 'BarreInfo')[0];
+    panel.getChildByName("btnLancerVague").onPointerUpObservable.add(() => this.CreerVague());
+
+
+  }
+
+  /**
+   * lance une vague
+   */
+  CreerVague() {
+    let unites = [];
+    let temps = 1000 ; /** @Todo A modifier quand le timer sera mis en place */
+
+    // creation du mesh de l'unité // A replacer par le bon mesh quand implémaentionde générations des unités à partie des bases
+    let modele = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 0.1 });
+    modele.material = new BABYLON.StandardMaterial("sphereMat");
+    modele.position.copyFrom(this.chemin.splinePoints[0]);
+
+    for (let i = 0; i < 10; i++) {
+      let unitMesh = modele.clone("sphere" + i);
+      unitMesh.material = modele.material.clone("sphereMat" + i)
+      let unit = new UniteDefaut(unitMesh, this.joueurs[0]);
+      unites.push(unit);
+    }
+
+
+    
+    let i = 0 // permet de décaler le début de l'animation pour chaque sphere 
+    for (const element of unites) {
+      //animation du déplacement de l'unité et de la portée
+      let animation = this.creerUniteAnimation(i,element.vitesse);
+
+      // Faire se déplacer l'unite et faire suivre la portée
+      element.uniteMesh.animations.push(animation);
+      element.porteeMesh.animations.push(animation);
+      this.scene.beginAnimation(element.uniteMesh, 0, temps, false);
+      this.scene.beginAnimation(element.porteeMesh, 0, temps, false);
+
+      i += 0.1;
+    }
+
+
+
+  }
+
+  /**
+ * Creation des animation l'unité en fonction de sa vitesse
+ */
+  creerUniteAnimation(depart, vitesse) {
+    const animation = new BABYLON.Animation("deplacementChemin", "position", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+
+    //Crée une animation de déplacement le long de la courbe
+    const keyFrames = [];
+    this.chemin.splinePoints.forEach((point, i) => {
+      (i == 0) ?
+        keyFrames.push({ frame: i, value: point, }) :
+        keyFrames.push({ frame: (i + depart) * 10 / vitesse , value: point, }); // implique vitesse max des unités = 10 
+    });
+
+
+    animation.setKeys(keyFrames);
+    return animation;
   }
 
 }

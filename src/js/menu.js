@@ -100,14 +100,13 @@ class SceneParDefaut {
         var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
         var btnJouer = BABYLON.GUI.Button.CreateSimpleButton("btnJouer", "jouer");
-        btnJouer.width = "150px"
+        btnJouer.width = "150px";
         btnJouer.height = "40px";
         btnJouer.color = "white";
         btnJouer.cornerRadius = 20;
         btnJouer.background = "blue";
 
         btnJouer.onPointerUpObservable.add(() => {
-            //console.log(this.configuration)
             this.configuration.createNewEngine();
             new Niveau(this.configuration,0);
 

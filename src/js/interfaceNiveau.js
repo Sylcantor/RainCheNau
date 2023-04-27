@@ -2,6 +2,9 @@
  * Gestion de l'interface
  */
 
+import { BaseAbstract } from "./baseAbstract.js";
+import { TypeJoueur } from "./typeJoueur.js";
+
 // Regarder la création de bouton avec des pixels au lieu de pourcentage pour voir comment l'interface réagit à le redimention
 class InterfaceNiveau {
   /**
@@ -20,6 +23,10 @@ class InterfaceNiveau {
 
     /**
      * @TODO timer quand on ferra le lancer de vague 
+     * Le timer doit permettre au unités les plus rapides (vitesse max = 10) d'atteindre la principale et de l'attaquer pandant au moins 10 secondes
+     * a la fin du timer toutes les unités en vie sont détruites
+     * Lancer le timer desactive le bouton attaquer pandant la durée de la vague
+     * Si il n'y à plus d'unités attaquantes le timer prend fin
      */
 
   }
@@ -163,10 +170,7 @@ class InterfaceNiveau {
     button.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT
     button.paddingBottomInPixels = 3;
     button.paddingRightInPixels = 3;
-
-    button.onPointerUpObservable.add(function () {
-      console.log("code bouton attaquer");
-    });
+    button.isEnabled = false;
 
     let panel = new BABYLON.GUI.StackPanel("BarreInfo");
     this.advancedTexture.addControl(panel);
@@ -190,11 +194,7 @@ class InterfaceNiveau {
 
   /**
    * Met à jours les details affichés dans le panneau d'information 
-   * @param {*} pv : pv d'une base
-   * @param {*} pvmax : pvMax d'une base
-   * @param {*} vitesseAttaque : vitesse d'attaque d'une base
-   * @param {*} portee : portée d'une base
-   * @param {*} attaque : attaque d'une base
+   * @param {BaseAbstract} base : base
    */
   MAJPanneauDescription(base) {
 
@@ -202,12 +202,14 @@ class InterfaceNiveau {
     
     let panel = this.advancedTexture.getDescendants(true, control => control.name === 'BarreInfo')[0];
 
-    panel.getChildByName("Selection").text = "";
+    panel.getChildByName("Selection").text = "base de : " + base.joueur.type.type;
     panel.getChildByName("Pv").text = "Pv: " + base.pv + " / " + base.pvmax;
     panel.getChildByName("Portee").text = "Portée: " + base.portee;
     panel.getChildByName("VitAtk").text = "Vitesse attaque: " + base.vitesseAttaque;
     panel.getChildByName("Atk").text = "Attaque: " + base.attaque;
 
+    (TypeJoueur.Joueur != base.joueur.type)? panel.getChildByName("btnLancerVague").isEnabled = true : panel.getChildByName("btnLancerVague").isEnabled = false; // moche, faire plus mieux
+    
   }
 
 }

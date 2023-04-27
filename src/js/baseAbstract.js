@@ -10,11 +10,10 @@ class BaseAbstract {
      */
     constructor(baseMesh, joueur, pv, attaque, portee, vitesseAttaque) {
         this.joueur = joueur;
+        
         this.baseMesh = baseMesh;
-        this.baseMesh.material = new BABYLON.StandardMaterial("Mat");
         this.baseMesh.material.diffuseColor = this.joueur.couleur;
         this.baseMesh.material.emissiveColor = this.joueur.couleur;
-        console.log(this.joueur.couleur);
 
         this.pvmax = pv;
         this.pv = pv;
@@ -22,9 +21,16 @@ class BaseAbstract {
         this.portee = portee;
         this.vitesseAttaque = vitesseAttaque;
 
+        //le tore est juste pour montrer la portee. 
+        // @todo : remplacer le tore par la portée du cylindre
         this.torus = BABYLON.MeshBuilder.CreateTorus("torus", { thickness: 0.01, diameter: this.portee, tessellation: 32 });
         this.torus.position = baseMesh.position;
         this.torus.setEnabled(false);
+
+        this.porteeMesh = BABYLON.MeshBuilder.CreateCylinder("portee", { diameter : portee, height: 0.01, tessellation: 32});
+        this.porteeMesh.position = baseMesh.position;
+        this.porteeMesh.setEnabled(false);
+
 
         this.baseMesh.actionManager = new BABYLON.ActionManager();
 

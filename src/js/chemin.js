@@ -12,8 +12,8 @@ class Chemin {
         this.splinePoints = this.spline.getPoints();
 
         //Affichage du chemin
-        const ligne = BABYLON.MeshBuilder.CreateLines("line", {points : this.splinePoints});
-        ligne.color = BABYLON.Color3.Gray();
+        this.ligne = BABYLON.MeshBuilder.CreateLines("line", {points : this.splinePoints});
+        this.ligne.color = BABYLON.Color3.Gray();
     }
 
     // toutes les différentes fonction de génération de chemin aléatoire ici
@@ -34,6 +34,7 @@ class Chemin {
         pointLigne.push(new BABYLON.Vector3(x, 0, z));
 
         // faire un chemin plus long que le nombre de bases secondaire
+        //for (let i = 0; i < nombreBasesSecondaire ; i++) {
         for (let i = 0; i < nombreBasesSecondaire + nombreBasesSecondaire*0.5 + 2; i++) {
             //éviter les boucles lors du traçage de la courbe
             x = x > 0 ? x + maximumx : x - maximumx;
