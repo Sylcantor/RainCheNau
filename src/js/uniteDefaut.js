@@ -7,11 +7,11 @@ class UniteDefaut extends UniteAbastract{
     /**
     * Constructeur
     * @param {int} joueur le joueur controlant l'unité
-    * @param {BABYLON.Mesh} baseMesh Mesh associé à l'unité
+    * @param {BABYLON.Mesh} uniteMesh Mesh associé à l'unité
     */
-    constructor(baseMesh, joueur) {
+    constructor(uniteMesh, joueur) {
         //Statistiques
-        super(baseMesh, joueur , 1, 1, 1, 1, 1);
+        super(uniteMesh, joueur , 1, 1, 1, 1, 1);
     }
 }
 export { UniteDefaut };

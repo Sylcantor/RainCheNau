@@ -5,6 +5,7 @@ import { InterfaceNiveau } from "./interfaceNiveau.js";
 import { Joueur } from "./joueur.js";
 import { TypeJoueur } from "./typeJoueur.js";
 import { UniteDefaut } from "./uniteDefaut.js";
+import { Vague } from "./vague.js";
 
 /**
  * Affichage et gestion d'un niveau
@@ -279,8 +280,9 @@ class Niveau {
     this.scene.onPointerObservable.add((pointerInfo) => {
       switch (pointerInfo.type) {
         case BABYLON.PointerEventTypes.POINTERDOWN:
-          for (const element of this.basesPrincipales) { element.torus.setEnabled(false); }
-          for (const element of this.basesSecondaires) { element.torus.setEnabled(false); }
+          for (const element of this.basesPrincipales.concat(this.basesSecondaires)) {
+            element.torus.setEnabled(false);
+          }
       }
     });
   }
@@ -298,34 +300,20 @@ class Niveau {
    * Creation et lancement d'une vague
    */
   CreerVague() {
-    let unites = [];
-    let temps = 1000 ; /** @Todo A modifier quand le timer sera mis en place */
+    let temps = 1000; /** @Todo A modifier quand le timer sera mis en place */
+    let vague = new Vague(this.joueurs[0], this.basesPrincipales[0], this.basesSecondaires[0], this.chemin);
+    this.lancerVague(temps,vague);
+  }
 
-    // creation du mesh de l'unité
-    /**
-     * @todo A replacer par le bon mesh quand implémentation de générations des unités à partie des bases
-     */
-    let modele = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 0.1 });
-    modele.material = new BABYLON.StandardMaterial("sphereMat");
-    modele.position.copyFrom(this.chemin.splinePoints[0]);
-
-    for (let i = 0; i < 10; i++) {
-      let unitMesh = modele.clone("sphere" + i);
-      unitMesh.material = modele.material.clone("sphereMat" + i)
-      let unit = new UniteDefaut(unitMesh, this.joueurs[0]);
-      unites.push(unit);
-    }
-    
-    let i = 0 // permet de décaler le début de l'animation pour chaque sphere 
-    for (const element of unites) {
-      // Faire se déplacer l'unite et faire suivre la portée
-      element.uniteMesh.animations.push(element.creerUniteAnimation(i,this.chemin.splinePoints));
-      element.portee.porteeMesh.animations.push( element.uniteMesh.animations[0].clone());
-
-      //element.portee.porteeMesh.setEnabled(true); //test pour voir si la portée suis le mesh
+  /**
+   * Lance une vague
+   * @param {int} temps temps avant la fin de la vague
+   * @param {*} vague la  vague à lancer
+   */
+  lancerVague(temps, vague){
+    for (const element of vague.unites) {
       this.scene.beginAnimation(element.uniteMesh, 0, temps, false);
       this.scene.beginAnimation(element.portee.porteeMesh, 0, temps, false);
-      i += 0.1;
     }
   }
 

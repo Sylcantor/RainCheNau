@@ -1,3 +1,4 @@
+import { BaseAbstract } from "./baseAbstract.js";
 import { Portee } from "./portee.js";
 /**
  * Code commun à toutes les unités
@@ -23,7 +24,7 @@ class UniteAbastract {
         this.pvmax = pv;
         this.pv = pv;
         this.attaque = attaque;
-        this.portee = portee;
+        this.porteeStat = portee;
         this.vitesseAttaque = vitesseAttaque;
         this.vitesse = vitesse; // viesse max = 10, à prendre en compte lors des amélioration, si il est atteint bonus sur les autres stats ?
 
@@ -41,7 +42,6 @@ class UniteAbastract {
     */
     creerUniteAnimation(depart, points) {
         const animation = new BABYLON.Animation("deplacementChemin", "position", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
-
         //Crée une animation de déplacement le long de la courbe
         const keyFrames = [];
         points.forEach((point, i) => {
@@ -49,9 +49,25 @@ class UniteAbastract {
                 keyFrames.push({ frame: i, value: point, }) :
                 keyFrames.push({ frame: (i + depart) * 10 / this.vitesse, value: point, });
         });
-
         animation.setKeys(keyFrames);
         return animation;
+    }
+
+
+    /**
+     * Labase que l'unité doit attaquer
+     * @param {BaseAbstract} baseAViser 
+     */
+    ViserCible(baseAViser) {
+
+        this.portee.porteeMesh.actionManager.registerAction(
+            new BABYLON.ExecuteCodeAction({
+                trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger,
+                parameter: baseAViser.baseMesh
+            }, function (evt) {
+                let base = this.getTriggerParameter();
+                //console.log(base);
+            }));
     }
 
 }

@@ -16,7 +16,7 @@ class SceneParDefaut {
         this.configureAssetManager();  //  Configure la scene et affiche le rendu à interval réguliers
 
     }
-
+type="module"
 
     /**
      * Configurer tout les eléménts de la scene et recharger régulierement le rendu scene

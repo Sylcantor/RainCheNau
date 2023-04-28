@@ -28,11 +28,11 @@ class BaseAbstract {
 
         //le tore est juste pour montrer la portee. 
         // @todo : remplacer le tore par la portée du cylindre
-        this.torus = BABYLON.MeshBuilder.CreateTorus("torus", { thickness: 0.01, diameter: this.portee, tessellation: 32 });
+        this.torus = BABYLON.MeshBuilder.CreateTorus("torus", { thickness: 0.01, diameter: this.porteeStat, tessellation: 32 });
         this.torus.position = baseMesh.position;
         this.torus.setEnabled(false);
 
-        this.portee = new Portee(portee, baseMesh.position);
+        this.portee = new Portee(this.porteeStat, baseMesh.position);
 
         this.baseMesh.actionManager = new BABYLON.ActionManager();
 
