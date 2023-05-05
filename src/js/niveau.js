@@ -4,7 +4,6 @@ import { BaseSecondaire } from "./baseSecondaire.js";
 import { InterfaceNiveau } from "./interfaceNiveau.js";
 import { Joueur } from "./joueur.js";
 import { TypeJoueur } from "./typeJoueur.js";
-import { UniteDefaut } from "./uniteDefaut.js";
 import { Vague } from "./vague.js";
 
 /**
@@ -272,8 +271,8 @@ class Niveau {
   effeScene() {
     // annimation de toutes les bases
     for (const element of this.basesPrincipales.concat(this.basesSecondaires)) {
-      this.scene.beginAnimation(element.baseMesh, 0, 360, true);
-      this.gl.addIncludedOnlyMesh(element.baseMesh);
+      this.scene.beginAnimation(element.cibleMesh, 0, 360, true);
+      this.gl.addIncludedOnlyMesh(element.cibleMesh);
     }
 
     // Cacher/afficher les portées des bases
@@ -297,12 +296,24 @@ class Niveau {
   }
 
   /**
-   * Creation et lancement d'une vague
+   * Creation, lancement d'une vague et mise en place de la défense des bases
    */
   CreerVague() {
     let temps = 1000; /** @Todo A modifier quand le timer sera mis en place */
-    let vague = new Vague(this.joueurs[0], this.basesPrincipales[0], this.basesSecondaires[0], this.chemin);
-    this.lancerVague(temps,vague);
+
+    //modifier la cible
+    let vague = new Vague(this.joueurs[0], this.basesPrincipales[0], [this.basesSecondaires[0],this.basesPrincipales[1]], this.chemin); // ne marche que pour une partie avec 1 joueur et un non joueur
+    this.lancerVague(temps, vague);
+
+
+    /** @todo : defensives cibler unités */
+
+    
+
+    for (const base of this.basesSecondaires.concat(this.basesPrincipales[1])){
+      this.ciblerUnites(base, vague);
+    }
+
   }
 
   /**
@@ -310,10 +321,23 @@ class Niveau {
    * @param {int} temps temps avant la fin de la vague
    * @param {*} vague la  vague à lancer
    */
-  lancerVague(temps, vague){
+  lancerVague(temps, vague) {
     for (const element of vague.unites) {
-      this.scene.beginAnimation(element.uniteMesh, 0, temps, false);
-      this.scene.beginAnimation(element.portee.porteeMesh, 0, temps, false);
+      let animUnite = this.scene.beginAnimation(element.cibleMesh, 0, temps, false);
+      let animPortee = this.scene.beginAnimation(element.portee.porteeMesh, 0, temps, false);
+      element.animationUnite = animUnite;
+      element.animPortee = animPortee;
+    }
+  }
+
+
+  ciblerUnites(base, vague){
+    for (const unite of vague.unites) {
+      if(base.joueur != unite.joueur){
+        //console.log('passif', unite);
+        //console.log()
+        base.ViserCible(unite);
+      }
     }
   }
 

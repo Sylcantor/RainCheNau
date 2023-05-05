@@ -9,7 +9,7 @@ class TypeJoueur {
 
     /**
      * Constructeur
-     * @param {*} type : type de joueur (ia ou personne)
+     * @param {string} type : type de joueur (ia ou personne)
      */
     constructor(type) {
         this.type = type;

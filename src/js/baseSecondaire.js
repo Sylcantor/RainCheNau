@@ -6,11 +6,11 @@ import { BaseAbstract } from "./baseAbstract.js";
 class BaseSecondaire extends BaseAbstract{
     /**
     * Constructeur
-    * @param {BABYLON.Mesh} baseMesh Mesh associé à la base
+    * @param {BABYLON.Mesh} cibleMesh Mesh associé à la base
     */
-    constructor(baseMesh, joueur) {
+    constructor(cibleMesh, joueur) {
         //Statistiques
-        super(baseMesh, joueur, 10, 1, 2, 2);
+        super(cibleMesh, joueur, 10, 1, 2, 2);
 
     }
 

@@ -205,7 +205,7 @@ class InterfaceNiveau {
     panel.getChildByName("VitAtk").text = "Vitesse attaque: " + base.vitesseAttaque;
     panel.getChildByName("Atk").text = "Attaque: " + base.attaque;
 
-    (TypeJoueur.Joueur != base.joueur.type)? panel.getChildByName("btnLancerVague").isEnabled = true : panel.getChildByName("btnLancerVague").isEnabled = false; // moche, faire plus mieux
+    (TypeJoueur.Joueur != base.joueur.type)? panel.getChildByName("btnLancerVague").isEnabled = true : panel.getChildByName("btnLancerVague").isEnabled = false;
     
   }
 

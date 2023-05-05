@@ -1,40 +1,30 @@
-import { Portee } from "./portee.js";
+import { CibleAbstract } from "./cibleAbstract.js";
 
 /**
  * Code commun à toutes les bases
  */
-class BaseAbstract {
+class BaseAbstract extends CibleAbstract{
 
     /**
      * Constructeur
-     * @param {BABYLON.Mesh} baseMesh Messh associé à la base
+     * @param {BABYLON.Mesh} cibleMesh Messh associé à la base
      * @param {int} pv points de vie de départ de la base
      * @param {int} attaque attaque de départ de la base
      * @param {int} portee portée de départ de la base
      * @param {int} vitesseAttaque vitesse d'attaque de départ de la base
      */
-    constructor(baseMesh, joueur, pv, attaque, portee, vitesseAttaque) {
-        this.joueur = joueur;
+    constructor(cibleMesh, joueur, pv, attaque, portee, vitesseAttaque) {
 
-        this.baseMesh = baseMesh;
-        this.baseMesh.material.diffuseColor = this.joueur.couleur;
-        this.baseMesh.material.emissiveColor = this.joueur.couleur;
+        super(cibleMesh, joueur, pv, attaque, portee, vitesseAttaque);
 
-        this.pvmax = pv;
-        this.pv = pv;
-        this.attaque = attaque;
-        this.porteeStat = portee;
-        this.vitesseAttaque = vitesseAttaque;
+        this.cibleMesh.material.diffuseColor = this.joueur.couleur;
+        this.estBase = true; // permet de savoir si le cibleMesh est une base
 
         //le tore est juste pour montrer la portee. 
         // @todo : remplacer le tore par la portée du cylindre
         this.torus = BABYLON.MeshBuilder.CreateTorus("torus", { thickness: 0.01, diameter: this.porteeStat, tessellation: 32 });
-        this.torus.position = baseMesh.position;
+        this.torus.position = cibleMesh.position;
         this.torus.setEnabled(false);
-
-        this.portee = new Portee(this.porteeStat, baseMesh.position);
-
-        this.baseMesh.actionManager = new BABYLON.ActionManager();
 
         this.preparerAnimation();
         this.SeletionBase();
@@ -43,7 +33,7 @@ class BaseAbstract {
 
 
     /**
-     * Créer l'animation de baseMesh
+     * Créer l'animation de cibleMesh
      */
     preparerAnimation() {
         const animation = new BABYLON.Animation("cubeAnimation", "rotation", 10, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
@@ -59,14 +49,13 @@ class BaseAbstract {
             });
         }
         animation.setKeys(keyFrames);
-        this.baseMesh.animations.push(animation);
+        this.cibleMesh.animations.push(animation);
     }
 
 
     //maj des stat en fonction de la difficulté du niveau
     //maj des stat chaque tours
     //emplacements
-    //détecton des unités
 
 
     /**
@@ -74,25 +63,25 @@ class BaseAbstract {
      * Prise dans https://playground.babylonjs.com/#J19GYK#0
      */
     BaseOverAndOut() {
-        this.baseMesh.actionManager.registerAction(new BABYLON.SetValueAction(BABYLON.ActionManager.OnPointerOutTrigger, this.baseMesh.material, "emissiveColor", this.baseMesh.material.emissiveColor));
-        this.baseMesh.actionManager.registerAction(new BABYLON.SetValueAction(BABYLON.ActionManager.OnPointerOverTrigger, this.baseMesh.material, "emissiveColor", BABYLON.Color3.White()));
+        this.cibleMesh.actionManager.registerAction(new BABYLON.SetValueAction(BABYLON.ActionManager.OnPointerOutTrigger, this.cibleMesh.material, "emissiveColor", this.cibleMesh.material.emissiveColor));
+        this.cibleMesh.actionManager.registerAction(new BABYLON.SetValueAction(BABYLON.ActionManager.OnPointerOverTrigger, this.cibleMesh.material, "emissiveColor", BABYLON.Color3.White()));
 
-        this.baseMesh.actionManager.registerAction(new BABYLON.InterpolateValueAction(BABYLON.ActionManager.OnPointerOutTrigger, this.baseMesh, "scaling", new BABYLON.Vector3(1, 1, 1), 150));
-        this.baseMesh.actionManager.registerAction(new BABYLON.InterpolateValueAction(BABYLON.ActionManager.OnPointerOverTrigger, this.baseMesh, "scaling", new BABYLON.Vector3(1.1, 1.1, 1.1), 150));
+        this.cibleMesh.actionManager.registerAction(new BABYLON.InterpolateValueAction(BABYLON.ActionManager.OnPointerOutTrigger, this.cibleMesh, "scaling", new BABYLON.Vector3(1, 1, 1), 150));
+        this.cibleMesh.actionManager.registerAction(new BABYLON.InterpolateValueAction(BABYLON.ActionManager.OnPointerOverTrigger, this.cibleMesh, "scaling", new BABYLON.Vector3(1.1, 1.1, 1.1), 150));
     }
 
     /**
      * Animation au click de la souris sur la base
      */
     SeletionBase() {
-        this.baseMesh.actionManager.registerAction(
+        this.cibleMesh.actionManager.registerAction(
             new BABYLON.ExecuteCodeAction({
                 trigger: BABYLON.ActionManager.OnPickTrigger,
                 parameter: { base: this }
             },
                 function (evt) {
                     let base = this.getTriggerParameter().base;
-                    base.baseMesh._scene.interface.MAJPanneauDescription(base);
+                    base.cibleMesh._scene.interface.MAJPanneauDescription(base);
                     base.torus.setEnabled(true);
                 }));
     }

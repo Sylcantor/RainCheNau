@@ -1,13 +1,15 @@
 import { BaseAbstract } from "./baseAbstract.js";
-import { Portee } from "./portee.js";
+import { CibleAbstract } from "./cibleAbstract.js";
+import { Projectile } from "./projectile.js";
+
 /**
  * Code commun à toutes les unités
  */
-class UniteAbastract {
+class UniteAbastract extends CibleAbstract{
 
     /**
      * Constructeur
-     * @param {BABYLON.Mesh} uniteMesh Messh associé à l'unité
+     * @param {BABYLON.Mesh} cibeMesh Messh associé à l'unité
      * @param {int} joueur le joueur controlant l'unité
      * @param {int} pv points de vie de l'unité
      * @param {int} attaque attaque de l'unité
@@ -15,23 +17,17 @@ class UniteAbastract {
      * @param {int} vitesseAttaque vitesse d'attaque de l'unité
      * @param {int} vitesse vitesse de l'unité
      */
-    constructor(uniteMesh, joueur, pv, attaque, portee, vitesseAttaque, vitesse) {
-        this.joueur = joueur;
+    constructor(cibeMesh, joueur, pv, attaque, portee, vitesseAttaque, vitesse) {
+        
+        super(cibeMesh, joueur, pv, attaque, portee, vitesseAttaque);
+        
+        //this.cibles = basesAViser;
+        this.vitesse = vitesse; 
+        // statistique en plus des bases vus que les unités se déplacent
+        // viesse max = 10, à prendre en compte lors des amélioration, si il est atteint bonus sur les autres stats ?
 
-        this.uniteMesh = uniteMesh;
-        this.uniteMesh.material.emissiveColor = this.joueur.couleur;
-
-        this.pvmax = pv;
-        this.pv = pv;
-        this.attaque = attaque;
-        this.porteeStat = portee;
-        this.vitesseAttaque = vitesseAttaque;
-        this.vitesse = vitesse; // viesse max = 10, à prendre en compte lors des amélioration, si il est atteint bonus sur les autres stats ?
-
-        this.portee = new Portee(portee, uniteMesh.position);
-
-        this.uniteMesh.actionManager = new BABYLON.ActionManager();
-
+        this.animationUnite;
+        this.animPortee;
     }
 
     /**
@@ -53,21 +49,22 @@ class UniteAbastract {
         return animation;
     }
 
-
     /**
-     * Labase que l'unité doit attaquer
-     * @param {BaseAbstract} baseAViser 
+     * Attaque la cible à interval régulier
+     * @param {CibleAbstract} cible 
      */
-    ViserCible(baseAViser) {
+    async Attaquer(base) {
+        //Mise en pause du déplacement de l'unité
+        this.animationUnite.pause();
+        this.animPortee.pause();
 
-        this.portee.porteeMesh.actionManager.registerAction(
-            new BABYLON.ExecuteCodeAction({
-                trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger,
-                parameter: baseAViser.baseMesh
-            }, function (evt) {
-                let base = this.getTriggerParameter();
-                //console.log(base);
-            }));
+        // attendre que l'unite ai fini d'attaquer pour reprendre le déplacement
+        this.cibleVerouillee = await super.Attaquer(base);
+
+
+        // restart ou pas en fonction de l'etat de l'unité
+        this.animationUnite.restart();
+        this.animPortee.restart();
     }
 
 }

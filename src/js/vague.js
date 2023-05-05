@@ -12,17 +12,17 @@ class Vague {
     /**
      * Constructeur
      * @param {Joueur} joueur Le joueur attaquant
-     * @param {BaseAbstract[]} basesJoueurAtaquant les bases du joueur attaquant
-     * @param {BaseAbstract} baseCiblee la base ciblée par le joueur
+     * @param {BaseAbstract[]} basesJoueurAtaquant les bases du joueur attaquant (generation à partir du deck)
+     * @param {BaseAbstract} basesAViser la base ciblée par le joueur
      * @param {Chemin} chemin le chemin de la partie
      */
-    constructor(joueur, basesJoueurAtaquant, baseCiblee, chemin) {
+    constructor(joueur, basesJoueurAtaquant, basesCiblee, chemin) {
 
         /**
          * @Todo : recupérer les stats des unités à générer à partir des cartes dans les emplacement des bases du joueur attaquant
          */
 
-        this.cible = baseCiblee;
+        this.cibles = basesCiblee;
 
         this.unites = this.creerUnites(joueur, chemin.splinePoints);
         
@@ -36,9 +36,8 @@ class Vague {
      */
     creerUnites(joueur, chemin){
         let unites = [];
-
         //A faire pour chaque emplacement du joueur
-        //creation du modele de l'unité A faire en fonction de la carte unité de l'emplacement
+        //creation du modele de l'unité : A faire en fonction de la carte unité de l'emplacement
         let nomMesh = "sphere";
         let nomMeshMat = "sphereMat";
 
@@ -46,18 +45,16 @@ class Vague {
         modele.material = new BABYLON.StandardMaterial(nomMeshMat);
         modele.position.copyFrom(chemin[0]);
 
-        //Pouvoir a faire en fonction de la carte pouvoir de l'emplacement
+        //Pouvoir : a faire en fonction de la carte pouvoir de l'emplacement
 
-        //Le nombre d'unité est à faire en fonction de la carte multiplicateur de l'emplacement
-        let nombreUnite = 10;
+        //Le nombre d'unité : est à faire en fonction de la carte multiplicateur de l'emplacement
+        let nombreUnite = 1;
         for (let i = 0; i < nombreUnite; i++) {
             let uniteMesh = modele.clone(nomMesh + i);
             uniteMesh.material = modele.material.clone(nomMeshMat + i)
             let unite = new UniteDefaut(uniteMesh, joueur);
-
             unites.push(unite);
           }
-
         // preparer l'animation
         this.preparerAnimationDeplacementUnites(unites,chemin);
         return unites;
@@ -69,15 +66,17 @@ class Vague {
      * @param {BABYLON.Vector3[]} chemin les points du chemin
      */
     preparerAnimationDeplacementUnites(unites, chemin){
-        let decalage = 0;
-        for(let unite of unites){
-            unite.uniteMesh.animations.push(unite.creerUniteAnimation(decalage, chemin));
-            unite.portee.porteeMesh.animations.push(unite.uniteMesh.animations[0].clone());
-            decalage += 0.3;
+        let decalage = 0;// permet de décaler le départ de l'animation
 
-            unite.ViserCible(this.cible); // viser la base à attaquer
+        for(let unite of unites){
+            let animation = unite.creerUniteAnimation(decalage, chemin);
+            unite.cibleMesh.animations.push(animation);
+            unite.portee.porteeMesh.animations.push(animation.clone());
+            decalage += 0.3;
+            for(let base of this.cibles){
+                unite.ViserCible(base); // viser la base à attaquer
+            } 
         }
     }
-
 }
 export { Vague };

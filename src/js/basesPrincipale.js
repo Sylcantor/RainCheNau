@@ -6,12 +6,12 @@ import { BaseAbstract } from "./baseAbstract.js";
 class BasePrincipale extends BaseAbstract{
     /**
     * Constructeur
-    * @param {BABYLON.Mesh} baseMesh Mesh associé à la base
+    * @param {BABYLON.Mesh} cibleMesh Mesh associé à la base
     */
-    constructor(baseMesh, joueur) {
+    constructor(cibleMesh, joueur) {
         //Statistiques
-        super(baseMesh,joueur , 25, 2, 2, 1);
-        this.baseMesh.showBoundingBox = true;
+        super(cibleMesh, joueur , 25, 2, 2, 1);
+        this.cibleMesh.showBoundingBox = true;
     }
     //maj des stat en fonction de la difficulté du niveau
     //maj des stat chaque tours
