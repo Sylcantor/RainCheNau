@@ -1,6 +1,4 @@
-# RainCheNau: BabylonJS Card Strategy Game
-
-[Games On Web 2023](https://www.cgi.com/france/fr-fr/event/games-on-web-2023) project.  
+# RainCheNau: BabylonJS Card Strategy Game   
 
 RainCheNau is a 3D card strategy game built using HTML, CSS, JS, and BabylonJS.  
 The game revolves around destroying the enemy's main base by sending waves of units along a path.  
