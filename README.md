@@ -74,4 +74,4 @@ This project is a prototype submission for the [Games On Web 2023](https://www.c
 - Fanny Mettens  
 - Ambre Journot  
 
-For more details, refer to the original GDD (in French).
+For more details, refer to the original [GDD](https://github.com/Sylcantor/RainCheNau/blob/main/docs/GDD.pdf) (in French).
