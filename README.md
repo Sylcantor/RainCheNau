@@ -1,5 +1,7 @@
 # RainCheNau: BabylonJS Card Strategy Game   
 
+[Play the game here](https://sylcantor.github.io/RainCheNau/)  
+
 RainCheNau is a 3D card strategy game built using HTML, CSS, JS, and BabylonJS.  
 The game revolves around destroying the enemy's main base by sending waves of units along a path.  
 Players control a deck of cards to create units and strategically build their army.  
