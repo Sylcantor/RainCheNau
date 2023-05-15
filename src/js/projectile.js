@@ -9,9 +9,11 @@ class Projectile {
      * @param {BABYLON.Vector3} position position de départ du projectile
      * @param {BABYLON.Color3} couleur couleur du projectile
      * @param {int} degats degats fait par le projectile
+     * @param {string} nom le nom à donner au mesh du projectile
      */
-    constructor(position, couleur, degats) {
-        this.projectileMesh = this.CreerMesh(position, couleur);
+    constructor(position, joueur, degats, nom) {
+        this.joueur = joueur
+        this.projectileMesh = this.CreerMesh(position, this.joueur.couleur, nom);
         this.degats = degats;
     }
 
@@ -19,18 +21,18 @@ class Projectile {
      * Crée le mesh du projectile
      * @param {BABYLON.Vector3} position position initales du projectile
      * @param {BABYLON.Color3} couleur couleur du projectile
+     * @param {string} nom le nom à donner au mesh du projectile
+     * 
      * @returns {BABYLON.Mesh} le mesh du projectile
      */
-    CreerMesh(position, couleur) {
-        let projectileMesh = BABYLON.MeshBuilder.CreateSphere("projectile", { diameter: 0.05 });
+    CreerMesh(position, couleur, nom) {
+        let projectileMesh = BABYLON.MeshBuilder.CreateSphere("projectile"+nom, { diameter: 0.05 });
         projectileMesh.material = new BABYLON.StandardMaterial("projectileMaterial");
         projectileMesh.material.diffuseColor = couleur;
 
         projectileMesh.position = new BABYLON.Vector3(position.x, position.y, position.z);
 
         projectileMesh.actionManager = new BABYLON.ActionManager();
-
-        this.etatCible = true;// indiquesi la cible est vivante
 
         return projectileMesh
     }
@@ -48,7 +50,6 @@ class Projectile {
             this.projectileMesh.moveWithCollisions(p.subtract(this.projectileMesh.position));
             this.projectileMesh.lookAt(cible.cibleMesh.position);
         });
-
         this.toucher(cible);
     }
 
@@ -63,7 +64,7 @@ class Projectile {
                 trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger,
                 parameter: cible.cibleMesh
             }, () => {
-                this.quandToucheCible(cible);
+                this.appliquerDegats(cible);
             }));
     }
 
@@ -72,12 +73,15 @@ class Projectile {
      * infliger des dégats à la cible quand touchée et supprime le projectile
      * @param {CibleAbstract} cible 
      */
-    quandToucheCible(cible) {
-        cible.pv -= this.degats;
-        //console.log(cible.pv);
+    appliquerDegats(cible) {
+        if (cible.pv > 0 && cible.etatCible){ // si la cible n'est pas déjà morte
+            cible.perdrePv(this.degats, this.joueur);
+        }
+
+        /**
+         * @todo ajouter une animation
+         */
         this.projectileMesh.dispose();
-        
-        return  (cible.pv <= 0);
     }
 }
 export { Projectile };

@@ -10,12 +10,11 @@ class BasePrincipale extends BaseAbstract{
     */
     constructor(cibleMesh, joueur) {
         //Statistiques
-        super(cibleMesh, joueur , 25, 2, 2, 1);
+        super(cibleMesh, joueur , 25, 2, 2.5, 1);
         this.cibleMesh.showBoundingBox = true;
     }
     //maj des stat en fonction de la difficulté du niveau
     //maj des stat chaque tours
     //emplacements
-    //détecton des unités
 }
 export { BasePrincipale };

@@ -334,8 +334,6 @@ class Niveau {
   ciblerUnites(base, vague){
     for (const unite of vague.unites) {
       if(base.joueur != unite.joueur){
-        //console.log('passif', unite);
-        //console.log()
         base.ViserCible(unite);
       }
     }

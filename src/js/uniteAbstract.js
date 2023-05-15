@@ -5,7 +5,7 @@ import { Projectile } from "./projectile.js";
 /**
  * Code commun à toutes les unités
  */
-class UniteAbastract extends CibleAbstract{
+class UniteAbastract extends CibleAbstract {
 
     /**
      * Constructeur
@@ -18,11 +18,10 @@ class UniteAbastract extends CibleAbstract{
      * @param {int} vitesse vitesse de l'unité
      */
     constructor(cibeMesh, joueur, pv, attaque, portee, vitesseAttaque, vitesse) {
-        
+
         super(cibeMesh, joueur, pv, attaque, portee, vitesseAttaque);
-        
-        //this.cibles = basesAViser;
-        this.vitesse = vitesse; 
+
+        this.vitesse = vitesse;
         // statistique en plus des bases vus que les unités se déplacent
         // viesse max = 10, à prendre en compte lors des amélioration, si il est atteint bonus sur les autres stats ?
 
@@ -54,18 +53,30 @@ class UniteAbastract extends CibleAbstract{
      * @param {CibleAbstract} cible 
      */
     async Attaquer(base) {
+
         //Mise en pause du déplacement de l'unité
         this.animationUnite.pause();
         this.animPortee.pause();
 
-        // attendre que l'unite ai fini d'attaquer pour reprendre le déplacement
-        this.cibleVerouillee = await super.Attaquer(base);
+        super.Attaquer(base);
 
-
-        // restart ou pas en fonction de l'etat de l'unité
+        while(this.etatCible && base.etatCible){ // permet de forcer l'unité à rester sur place
+            //console.log("pv de la cible", base.pv)
+            //attendre le temps de faire un tir de plus
+            await this.Attendre();
+        }
         this.animationUnite.restart();
         this.animPortee.restart();
     }
 
+    /**
+     * Action à la mort d'une unité
+     */
+    Mourir() {
+        //console.log(this.cibleMesh.name, 'meurt')
+        this.cibleMesh.dispose(true, true);
+        this.portee.porteeMesh.dispose(true, true);
+        super.Mourir();
+    }
 }
 export { UniteAbastract };

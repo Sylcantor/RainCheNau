@@ -14,6 +14,10 @@ class Chemin {
         //Affichage du chemin
         this.ligne = BABYLON.MeshBuilder.CreateLines("line", {points : this.splinePoints});
         this.ligne.color = BABYLON.Color3.Gray();
+
+        /**
+         * @todo : un affichage du chemin plus joli (pas prioritaire)
+         */
     }
 
     // toutes les différentes fonction de génération de chemin aléatoire ici

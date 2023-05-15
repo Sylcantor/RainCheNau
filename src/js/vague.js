@@ -48,13 +48,15 @@ class Vague {
         //Pouvoir : a faire en fonction de la carte pouvoir de l'emplacement
 
         //Le nombre d'unité : est à faire en fonction de la carte multiplicateur de l'emplacement
-        let nombreUnite = 1;
+        let nombreUnite = 10;
         for (let i = 0; i < nombreUnite; i++) {
             let uniteMesh = modele.clone(nomMesh + i);
             uniteMesh.material = modele.material.clone(nomMeshMat + i)
             let unite = new UniteDefaut(uniteMesh, joueur);
             unites.push(unite);
           }
+
+        modele.dispose(true, true);
         // preparer l'animation
         this.preparerAnimationDeplacementUnites(unites,chemin);
         return unites;

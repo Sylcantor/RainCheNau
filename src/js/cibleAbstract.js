@@ -27,14 +27,18 @@ class CibleAbstract {
         this.pv = pv;
         this.attaque = attaque;
         this.porteeStat = portee;
-        this.vitesseAttaque = vitesseAttaque;
+        this.vitesseAttaque = vitesseAttaque; // nombre de tir par seconde
 
         this.portee = new Portee(this.porteeStat, cibleMesh.position, cibleMesh.name);
 
-        this.cibles = []; // la liste des cibles à détruire 
         this.cibleVerouillee = null; // l'observable sur la cible pour l'attaquer plusieurs fois
+        this.etatCible = true; // cette cible est en etat de combattre et prend des dégats
+        
+        /**
+         * @todo Remettre toutes bases a true à la fin de la vague
+         */
 
-        this.peutTirer = true;
+        this.peutTirer = false;
 
     }
 
@@ -50,7 +54,7 @@ class CibleAbstract {
                 trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger,
                 parameter: cible.cibleMesh
             }, (evt) => {
-                this.cibles.push(cible); // ajouter une couvelle cible à la liste des cibles potentielles
+                //this.cibles.push(cible); // ajouter une couvelle cible à la liste des cibles potentielles
                 this.Attaquer(cible);
             }));
     }
@@ -63,35 +67,30 @@ class CibleAbstract {
      */
     async Attaquer(cible) {
         if (this.cibleVerouillee == null) { // regarder si une autre cible est visée
-            this.cibleVerouillee = true;
+            //console.log(this.cibleVerouillee, cible.cibleMesh.name);// this.cibleVerouillee = cible ou null
+            this.cibleVerouillee = cible;
 
-            //for (let i = 0; i < 3; i++) {
-            while (cible.pv > 0){
-                //console.log(this.cibleMesh.name,"avant", this.peutTirer);
+            let cpt = 0; // compteur pour donner un nom unique a chaque projectile qui sera lancé
+
+            while (cible.etatCible && this.etatCible) {
+                // l'etat des pv est en retard de 1 tir
+                // 11 tir (1 degat)pour 10 pv
+                    // solution les dégats ne sont pas infligés à la cible si ses pv sont en dessous de 0
+
                 if (!this.peutTirer) { // regarder si il est possible de tirer
-                    this.peutTirer = await this.Attendre(); // attendre sans bloquer l'execution du programme
-                    //console.log(this.cibleMesh.name,"apres", this.peutTirer);
+                    this.peutTirer = await this.Attendre(); // attendre sans bloquer l'execution d'autres attaques
                 }
-                this.LancerProjectile(cible);
-                this.peutTirer = false;
 
-                console.log(cible.cibleMesh.name, "etat des pv :",cible.pv, cible.pv > 0);
+                if(cible.etatCible && this.etatCible){ // la cible ou l'attaquant peuvent etre détruits pandant l'attente de l'attaquant
+                    this.LancerProjectile(cible, "_" + cpt + "_" + cible.cibleMesh.name);
+                    cpt += 1;
+                    this.peutTirer = false;
+                }
             }
-  
-            //}
-
-            
-
-            //enlever le for appeller Lancer projectile
-            //au debut de lancer projectile attendre asyschrone
-            //à la fin de lancer projectile check pv cible
-            // > relancer
-            // fin???
         }
-        
-        return new Promise(resolve => {resolve(this.cibleVerouillee)});
+        //this.peutTirer = true; // pret a tirer sur la cible suivante
+        this.cibleVerouillee = null;
     }
-
 
 
     /**
@@ -102,7 +101,7 @@ class CibleAbstract {
         return new Promise(resolve => {
             setTimeout(() => {
                 resolve(true);
-            }, 2000);
+            }, 1000 / this.vitesseAttaque);
         });
     }
 
@@ -110,23 +109,44 @@ class CibleAbstract {
 
     /**
      * attaque la cible à portée
-     * @param {CibleAbstract} cible 
+     * @param {CibleAbstract} cible la cible a viser
+     * @param {string} nom nom à donner au mesh du projectile 
      */
-    LancerProjectile(cible) {
-        let projectile = new Projectile(this.cibleMesh.position, this.joueur.couleur, this.attaque);
+    LancerProjectile(cible, nom) {
+        let projectile = new Projectile(this.cibleMesh.position, this.joueur, this.attaque, nom);
         projectile.cibler(cible);
-        //console.log(cible.cibleMesh.name, "etat pv :",cible.pv);
     }
 
-    
-    /**
-     * Mort
-     */
-
 
     /**
-     * Modif stats
+     * enleve des pv à la cible
+     * @param {int} degats nombre de pv à enlever
+     * @param {Joueur} joueur joueur attaquant la cible
      */
+    perdrePv(degats, joueur) {
+        this.pv -= degats;
+        /**
+         * @todo mettre a jour l'affichage des pv (pas urgent)
+         */
+        this.modifierEtat(joueur);
+    }
 
+    /**
+     * Modifie l'etat de la cible
+     * @param {Joueur} joueur le joueur attanquant la cible
+     */
+    modifierEtat(joueur) {
+        if (this.pv <= 0) {
+            this.Mourir(joueur);
+        }
+    }
+
+
+    /**
+     * Actions à la mort d'une cible
+     */
+    Mourir() {
+        this.etatCible = false
+    }
 }
 export { CibleAbstract };

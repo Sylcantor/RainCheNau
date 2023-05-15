@@ -13,7 +13,7 @@ class Joueur {
 
         this.couleur = (this.type == TypeJoueur.Joueur) ? BABYLON.Color3.Green() : BABYLON.Color3.Random();
         /**
-         * @Todo : cas random = vert
+         * @Todo : empecher le cas : random = vert (pas urgent)
          */
 
     }
