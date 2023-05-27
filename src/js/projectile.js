@@ -83,5 +83,6 @@ class Projectile {
          */
         this.projectileMesh.dispose();
     }
+    /**@TODO : detruire le projectile apres un certain temps URGENT */
 }
 export { Projectile };

@@ -299,20 +299,22 @@ class Niveau {
    * Creation, lancement d'une vague et mise en place de la défense des bases
    */
   CreerVague() {
-    let temps = 1000; /** @Todo A modifier quand le timer sera mis en place */
+    //console.log(this.scene.interface.baseCliquee)
+    let temps = 1000;
+    /** @Todo  A replacer en fonction de la longeur de la courbe URGENT*/
+
+    let cibles = this.basesPrincipales[1] != this.scene.interface.baseCliquee ? [this.scene.interface.baseCliquee, this.basesPrincipales[1]] : [this.basesPrincipales[1]]; // definir les cibles de la vague
 
     //modifier la cible
-    let vague = new Vague(this.joueurs[0], this.basesPrincipales[0], [this.basesSecondaires[0],this.basesPrincipales[1]], this.chemin); // ne marche que pour une partie avec 1 joueur et un non joueur
+    let vague = new Vague(this.joueurs[0], this.basesPrincipales[0], cibles, this.chemin);
     this.lancerVague(temps, vague);
 
-
-    /** @todo : defensives cibler unités */
-
-    
-
+    //Les tours ennemies cibles les unites
     for (const base of this.basesSecondaires.concat(this.basesPrincipales[1])){
       this.ciblerUnites(base, vague);
     }
+
+    // Retirer les anims, mettre les unites et la vague a null, enlever les event, vider les tableau de cibles à portée
 
   }
 

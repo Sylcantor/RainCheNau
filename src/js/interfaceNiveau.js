@@ -21,13 +21,7 @@ class InterfaceNiveau {
     this.advancedTexture.addControl(this.CreerLabelEtConteneur("vague", vagueRestante + "/" + vague, "0", "150"));
     this.advancedTexture.addControl(this.CreerLabelEtConteneur("monnaie", monnaie, "0", "300"));
 
-    /**
-     * @TODO timer quand on ferra le lancer de vague 
-     * Le timer doit permettre au unités les plus rapides (vitesse max = 10) d'atteindre la principale et de l'attaquer pandant au moins 10 secondes
-     * a la fin du timer toutes les unités en vie sont détruites
-     * Lancer le timer desactive le bouton attaquer pandant la durée de la vague
-     * Si il n'y à plus d'unités attaquantes le timer prend fin
-     */
+    this.baseCliquee = null; // La base actuellement décrite
 
   }
 
@@ -197,6 +191,8 @@ class InterfaceNiveau {
    * @param {BaseAbstract} base : base
    */
   MAJPanneauDescription(base) {
+    this.baseCliquee = base;
+
     let panel = this.advancedTexture.getDescendants(true, control => control.name === 'BarreInfo')[0];
 
     panel.getChildByName("Selection").text = "base de : " + base.joueur.type.type;

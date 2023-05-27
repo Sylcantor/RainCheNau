@@ -9,7 +9,7 @@ class UniteAbastract extends CibleAbstract {
 
     /**
      * Constructeur
-     * @param {BABYLON.Mesh} cibeMesh Messh associé à l'unité
+     * @param {BABYLON.Mesh} cibleMesh Messh associé à l'unité
      * @param {int} joueur le joueur controlant l'unité
      * @param {int} pv points de vie de l'unité
      * @param {int} attaque attaque de l'unité
@@ -17,9 +17,9 @@ class UniteAbastract extends CibleAbstract {
      * @param {int} vitesseAttaque vitesse d'attaque de l'unité
      * @param {int} vitesse vitesse de l'unité
      */
-    constructor(cibeMesh, joueur, pv, attaque, portee, vitesseAttaque, vitesse) {
+    constructor(cibleMesh, joueur, pv, attaque, portee, vitesseAttaque, vitesse) {
 
-        super(cibeMesh, joueur, pv, attaque, portee, vitesseAttaque);
+        super(cibleMesh, joueur, pv, attaque, portee, vitesseAttaque);
 
         this.vitesse = vitesse;
         // statistique en plus des bases vus que les unités se déplacent
@@ -50,10 +50,11 @@ class UniteAbastract extends CibleAbstract {
 
     /**
      * Attaque la cible à interval régulier
-     * @param {CibleAbstract} cible 
+     * @param {CibleAbstract} base 
      */
     async Attaquer(base) {
 
+        //console.log(base)
         //Mise en pause du déplacement de l'unité
         this.animationUnite.pause();
         this.animPortee.pause();
@@ -67,6 +68,7 @@ class UniteAbastract extends CibleAbstract {
         }
         this.animationUnite.restart();
         this.animPortee.restart();
+        c//onsole.log("pv de la cible", base.pv)
     }
 
     /**
@@ -78,5 +80,24 @@ class UniteAbastract extends CibleAbstract {
         this.portee.porteeMesh.dispose(true, true);
         super.Mourir();
     }
+
+    /**
+     * Vise la cible quand elle est a portée et lance une attauqe si possible
+     * @param {BaseAbstract} base 
+     */
+    ViserCible(base) {
+        //console.log(cible, this.cibleVerouillee)
+        this.portee.porteeMesh.actionManager.registerAction(
+            new BABYLON.ExecuteCodeAction({
+                trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger,
+                parameter: base.cibleMesh
+            }, (evt) => {
+                //this.cibles.push(cible); // ajouter une couvelle cible à la liste des cibles potentielles
+                if (this.cibleVerouillee == null || this.cibleVerouillee.joueur == this.joueur) { //attribue la 1ere cible ou verifie que la base actuellement ciblée à bien été capturée
+                    this.Attaquer(base);
+                }
+        }));
+    }
+
 }
 export { UniteAbastract };
