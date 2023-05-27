@@ -48,7 +48,7 @@ class Vague {
         //Pouvoir : a faire en fonction de la carte pouvoir de l'emplacement
 
         //Le nombre d'unité : est à faire en fonction de la carte multiplicateur de l'emplacement
-        let nombreUnite = 5;
+        let nombreUnite = 15;
         for (let i = 0; i < nombreUnite; i++) {
             let uniteMesh = modele.clone(nomMesh + i);
             uniteMesh.material = modele.material.clone(nomMeshMat + i)

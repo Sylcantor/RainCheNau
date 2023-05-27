@@ -68,7 +68,7 @@ class UniteAbastract extends CibleAbstract {
         }
         this.animationUnite.restart();
         this.animPortee.restart();
-        c//onsole.log("pv de la cible", base.pv)
+        //console.log("pv de la cible", base.pv)
     }
 
     /**

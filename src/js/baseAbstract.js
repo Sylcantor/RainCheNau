@@ -146,19 +146,63 @@ class BaseAbstract extends CibleAbstract {
             }));
     }
 
-    /**
-    * Attaque la cible à interval régulier
-    * @param {CibleAbstract} unite : l'unitée visée par la base
-    */
-    async Attaquer(unite) {
-        super.Attaquer(unite);
 
-        while (this.etatCible && unite.etatCible) { // permet de forcer l'unité à rester sur place
-            //console.log("pv de la cible", base.pv)
-            //attendre le temps de faire un tir de plus
-            await this.Attendre();
+    // /**
+    // * Attaque la cible à interval régulier
+    // * @param {CibleAbstract} unite : l'unitée visée par la base
+    // */
+    // async Attaquer(unite) {
+    //     super.Attaquer(unite);
+
+    //     while (this.etatCible && unite.etatCible) {
+    //         if (!(this.portee.porteeMesh.intersectsMesh(unite.cibleMesh, true))){
+    //             break;
+    //         }
+    //         await this.Attendre();
+    //     }
+    //     this.RelancerAtttaque();
+    // }
+
+    /**
+ * Attaque la cible à interval régulier
+ * @param {CibleAbstract} cible 
+ * @returns {boolean} la valeur de cible verouillée
+ */
+    async Attaquer(cible) {
+
+        this.cibleVerouillee = cible;
+        let cpt = 0; // compteur pour donner un nom unique a chaque projectile qui sera lancé
+
+        while (cible.etatCible && this.etatCible && this.portee.porteeMesh.intersectsMesh(cible.cibleMesh, true)) {
+            //console.log(this.cibleMesh.name, "attaque", cible.cibleMesh.name, cible.pv);
+            // l'etat des pv est en retard de 1 tir
+            // 11 tir (1 degat)pour 10 pv
+            // solution les dégats ne sont pas infligés à la cible si ses pv sont en dessous de 0
+
+            if (!this.peutTirer) { // regarder si il est possible de tirer
+                this.peutTirer = await this.Attendre(); // attendre sans bloquer l'execution d'autres attaques
+            }
+
+            if (cible.etatCible && this.etatCible && this.peutTirer) { // la cible ou l'attaquant peuvent etre détruits pandant l'attente de l'attaquant
+
+                //console.log(cible == this.cibleVerouillee)
+
+                // Se met parfois a tirer sur plusieurs cibles à la fois 
+                if (cible != this.cibleVerouillee){
+                    break
+                }
+                this.LancerProjectile(cible, "_" + cpt + "_" + cible.cibleMesh.name);
+                cpt += 1;
+                this.peutTirer = false;
+            }
         }
-        this.RelancerAtttaque();
+
+        // empécher de relancer plusieurs fois une attaque
+        if (cible == this.cibleVerouillee){
+            this.RelancerAtttaque();
+        }
+        
+        /** @Bug Tir sur multiples cibles  */
     }
 
     /**
@@ -173,6 +217,7 @@ class BaseAbstract extends CibleAbstract {
             //console.log(this.unitesAPortee)
             // unite toujour à portée avec pv > 0
             if (unite.pv > 0 && this.portee.porteeMesh.intersectsMesh(unite.cibleMesh, true)) {
+
                 this.Attaquer(unite);
                 break;
             }
