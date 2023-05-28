@@ -12,19 +12,22 @@ class Vague {
     /**
      * Constructeur
      * @param {Joueur} joueur Le joueur attaquant
-     * @param {BaseAbstract[]} basesJoueurAtaquant les bases du joueur attaquant (generation à partir du deck)
-     * @param {BaseAbstract} basesAViser la base ciblée par le joueur
+     * @param {int} nombeBasesJoueur le nombre de bases du joueur attaquant
+     * @param {BaseAbstract[]} basesCiblee la ou les base ciblée par le joueur
      * @param {Chemin} chemin le chemin de la partie
      */
-    constructor(joueur, basesJoueurAtaquant, basesCiblee, chemin) {
+    constructor(joueur, nombeBasesJoueur, basesCiblee, chemin) {
 
         /**
          * @Todo : recupérer les stats des unités à générer à partir des cartes dans les emplacement des bases du joueur attaquant
          */
 
         this.cibles = basesCiblee;
+        this.resteUnite = nombeBasesJoueur * 5;
 
-        this.unites = this.creerUnites(joueur, chemin.splinePoints);
+        this.unites = this.creerUnites(joueur, chemin.splinePoints, this.resteUnite);
+
+        this.quandResteUniteChangeEstAZero = new BABYLON.Observable();
         
     }
 
@@ -32,11 +35,13 @@ class Vague {
      * Crée les unités qui composentla vague
      * @param {Joueur} joueur le joueur attaquant
      * @param {BABYLON.Vector3[]} chemin les points du chemin
+     * @param {int} nbUnites le nombre d'unites de la vague
      * @returns {UniteAbastract[]} 
      */
-    creerUnites(joueur, chemin){
+    creerUnites(joueur, chemin, nbUnites){
+        let vague = this; // utilisé pour mettre a jours le nombre d'unités restantes
         let unites = [];
-        //A faire pour chaque emplacement du joueur
+        
         //creation du modele de l'unité : A faire en fonction de la carte unité de l'emplacement
         let nomMesh = "sphere";
         let nomMeshMat = "sphereMat";
@@ -45,14 +50,15 @@ class Vague {
         modele.material = new BABYLON.StandardMaterial(nomMeshMat);
         modele.position.copyFrom(chemin[0]);
 
-        //Pouvoir : a faire en fonction de la carte pouvoir de l'emplacement
-
-        //Le nombre d'unité : est à faire en fonction de la carte multiplicateur de l'emplacement
-        let nombreUnite = 15;
-        for (let i = 0; i < nombreUnite; i++) {
+        for (let i = 0; i < nbUnites; i++) {
             let uniteMesh = modele.clone(nomMesh + i);
             uniteMesh.material = modele.material.clone(nomMeshMat + i)
             let unite = new UniteDefaut(uniteMesh, joueur);
+
+            unite.QuandMeurt.add(() => {   
+                this.decrementerNbUnites(vague);
+            });
+
             unites.push(unite);
           }
 
@@ -78,6 +84,19 @@ class Vague {
             for(let base of this.cibles){
                 unite.ViserCible(base); // viser la base à attaquer
             } 
+        }
+    }
+
+
+    /**
+     * Met a jour le nombre d'unités en vie
+     * @param {Vague} vague 
+     */
+    decrementerNbUnites(vague){
+        vague.resteUnite -= 1;
+        //console.log (vague.resteUnite);
+        if (vague.resteUnite == 0) {
+            vague.quandResteUniteChangeEstAZero.notifyObservers();
         }
     }
 }

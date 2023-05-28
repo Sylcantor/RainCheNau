@@ -32,7 +32,7 @@ class CibleAbstract {
         this.portee = new Portee(this.porteeStat, cibleMesh.position, cibleMesh.name);
 
         this.cibleVerouillee = null; // l'observable sur la cible pour l'attaquer plusieurs fois
-        this.etatCible = true; // cette cible est en etat de combattre et prend des dégats
+        this.etatCible = true; // cette cible est en etat de combattre et prendre des dégats
 
         /**
          * @todo Remettre toutes bases a true à la fin de la vague
@@ -69,8 +69,6 @@ class CibleAbstract {
                 this.peutTirer = false;
             }
         }
-
-        //this.peutTirer = true; // pret a tirer sur la cible suivante
     }
 
 
@@ -106,9 +104,6 @@ class CibleAbstract {
      */
     perdrePv(degats, joueur) {
         this.pv -= degats;
-        /**
-         * @todo mettre a jour l'affichage des pv (pas urgent)
-         */
         this.modifierEtat(joueur);
     }
 

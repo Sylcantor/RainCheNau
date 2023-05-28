@@ -22,6 +22,7 @@ class InterfaceNiveau {
     this.advancedTexture.addControl(this.CreerLabelEtConteneur("monnaie", monnaie, "0", "300"));
 
     this.baseCliquee = null; // La base actuellement décrite
+    this.peutLancerVague = true; // eviter de lancer plusieurs vagues en meme temps
 
   }
 
@@ -127,7 +128,7 @@ class InterfaceNiveau {
   CreerLabelEtConteneur(nomLabel, texte, top, left) {
     var label = this.CreerLabel(nomLabel, texte);
 
-    var rectangle = new BABYLON.GUI.Rectangle();
+    var rectangle = new BABYLON.GUI.Rectangle("conteneur_"+nomLabel);
     rectangle.width = "150px";
     rectangle.height = "40px";
 
@@ -201,8 +202,18 @@ class InterfaceNiveau {
     panel.getChildByName("VitAtk").text = "Vitesse attaque: " + base.vitesseAttaque;
     panel.getChildByName("Atk").text = "Attaque: " + base.attaque;
 
-    (TypeJoueur.Joueur != base.joueur.type)? panel.getChildByName("btnLancerVague").isEnabled = true : panel.getChildByName("btnLancerVague").isEnabled = false;
+    (TypeJoueur.Joueur != base.joueur.type && this.peutLancerVague)? panel.getChildByName("btnLancerVague").isEnabled = true : panel.getChildByName("btnLancerVague").isEnabled = false;
     
+  }
+
+  /**
+   * Met à jour l'affichage du nombre de vague
+   * @param {int} vagueRestante 
+   * @param {int} vague 
+   */
+  MajNbVague(vagueRestante, vague){
+    let label = this.advancedTexture.getDescendants(false, control => control.name === 'vague')[0];
+    label.text = vagueRestante + "/" + vague;
   }
 
 }

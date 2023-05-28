@@ -111,6 +111,22 @@ class BaseAbstract extends CibleAbstract {
                 }));
     }
 
+
+    /**
+     * enleve des pv à la cible
+     * @param {int} degats nombre de pv à enlever
+     * @param {Joueur} joueur joueur attaquant la cible
+     */
+    perdrePv(degats, joueur) {
+        super.perdrePv(degats, joueur);
+
+        let interfaceJoueur = this.cibleMesh._scene.interface;
+        if(interfaceJoueur.baseCliquee == this){
+            interfaceJoueur.MAJPanneauDescription(this);
+        }
+    }
+
+
     /**
      * action à la mort d'une base
      * @param {Joueur} joueur le joueur dont le projectile mis a 0- le pv de la base
@@ -147,27 +163,11 @@ class BaseAbstract extends CibleAbstract {
     }
 
 
-    // /**
-    // * Attaque la cible à interval régulier
-    // * @param {CibleAbstract} unite : l'unitée visée par la base
-    // */
-    // async Attaquer(unite) {
-    //     super.Attaquer(unite);
-
-    //     while (this.etatCible && unite.etatCible) {
-    //         if (!(this.portee.porteeMesh.intersectsMesh(unite.cibleMesh, true))){
-    //             break;
-    //         }
-    //         await this.Attendre();
-    //     }
-    //     this.RelancerAtttaque();
-    // }
-
     /**
- * Attaque la cible à interval régulier
- * @param {CibleAbstract} cible 
- * @returns {boolean} la valeur de cible verouillée
- */
+    * Attaque la cible à interval régulier
+    * @param {CibleAbstract} cible 
+    * @returns {boolean} la valeur de cible verouillée
+    */
     async Attaquer(cible) {
 
         this.cibleVerouillee = cible;
@@ -188,7 +188,7 @@ class BaseAbstract extends CibleAbstract {
                 //console.log(cible == this.cibleVerouillee)
 
                 // Se met parfois a tirer sur plusieurs cibles à la fois 
-                if (cible != this.cibleVerouillee){
+                if (cible != this.cibleVerouillee) {
                     break
                 }
                 this.LancerProjectile(cible, "_" + cpt + "_" + cible.cibleMesh.name);
@@ -198,11 +198,11 @@ class BaseAbstract extends CibleAbstract {
         }
 
         // empécher de relancer plusieurs fois une attaque
-        if (cible == this.cibleVerouillee){
+        if (cible == this.cibleVerouillee) {
             this.RelancerAtttaque();
+        } else {
+            this.unitesAPortee.push(cible);
         }
-        
-        /** @Bug Tir sur multiples cibles  */
     }
 
     /**
@@ -210,18 +210,18 @@ class BaseAbstract extends CibleAbstract {
      */
     RelancerAtttaque() {
         //console.log(this.cibleVerouillee.pv)
-        // console.log(this.unitesAPortee, "KOUKOU")
 
         while (this.unitesAPortee.length > 0) {
             let unite = this.unitesAPortee.pop();
             //console.log(this.unitesAPortee)
-            // unite toujour à portée avec pv > 0
+            // unite toujours à portée avec pv > 0
             if (unite.pv > 0 && this.portee.porteeMesh.intersectsMesh(unite.cibleMesh, true)) {
-
                 this.Attaquer(unite);
                 break;
             }
         }
     }
+
+    /**@TODO encore un bug repéré sur les bases qui tirent pas */
 }
 export { BaseAbstract };

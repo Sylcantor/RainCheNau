@@ -23,15 +23,16 @@ class Niveau {
     this.nombreBasesSecondaire = difficulte + 1;
 
     this.labelNiveau = 1;
-    this.nombreVagueRestante = 2;
-    this.nombreVague = 3;
-    this.temps = 4;
-    this.monnaie = 5;
+    this.nombreVagueRestante = ((difficulte + 1) * 5) - (Math.floor(difficulte/1)); 
+    this.nombreVague = ((difficulte + 1) * 5) - (Math.floor(difficulte/1)); 
+    //this.temps = 4;
+    this.monnaie = 0;
     this.joueurs = [new Joueur(TypeJoueur.Joueur), new Joueur(TypeJoueur.Ia)];
 
 
     this.scene = new BABYLON.Scene(configuration.engine);
     this.gl = new BABYLON.GlowLayer("glow"); //permet de faire briller les mesh des bases
+
     // Interface graphique
     this.scene.interface = new InterfaceNiveau(this.labelNiveau, this.nombreVague, this.nombreVagueRestante, this.monnaie);
 
@@ -299,22 +300,49 @@ class Niveau {
    * Creation, lancement d'une vague et mise en place de la défense des bases
    */
   CreerVague() {
-    //console.log(this.scene.interface.baseCliquee)
-    let temps = 1000;
-    /** @Todo  A replacer en fonction de la longeur de la courbe URGENT*/
+    // Empécher de lancer plusieurs vagues
+    let inter = this.scene.interface;
+    let panel = inter.advancedTexture.getDescendants(true, control => control.name === 'BarreInfo')[0];
+    panel.getChildByName("btnLancerVague").isEnabled = false;
+    inter.peutLancerVague = false;
 
+    // Maj interface graphique
+    this.nombreVagueRestante -= 1;
+    let nbvague = this.nombreVague;
+    let nbVagueRestante = this.nombreVagueRestante;
+
+    let temps = Math.floor(this.chemin.splinePoints.length / 10) * 10000;// augmenter le temps avec les courbes plus longue pour éviter que l'annimation ne coupe au millieu
     let cibles = this.basesPrincipales[1] != this.scene.interface.baseCliquee ? [this.scene.interface.baseCliquee, this.basesPrincipales[1]] : [this.basesPrincipales[1]]; // definir les cibles de la vague
 
+    let nbBasesJoueur = 1;
+    for (const base of this.basesSecondaires){
+      if (base.joueur == this.joueurs[0] ){
+        nbBasesJoueur += 1
+      }
+    }
+
     //modifier la cible
-    let vague = new Vague(this.joueurs[0], this.basesPrincipales[0], cibles, this.chemin);
+    let vague = new Vague(this.joueurs[0], nbBasesJoueur, cibles, this.chemin);
     this.lancerVague(temps, vague);
 
+    // Permettre de relancer une vague
+    vague.quandResteUniteChangeEstAZero.add(() => {
+      inter.peutLancerVague = true;
+      panel.getChildByName("btnLancerVague").isEnabled = true;
+      inter.MajNbVague(nbVagueRestante, nbvague);
+    });
+
     //Les tours ennemies cibles les unites
-    for (const base of this.basesSecondaires.concat(this.basesPrincipales[1])){
+    for (const base of this.basesSecondaires.concat(this.basesPrincipales[1])) {
       this.ciblerUnites(base, vague);
     }
 
+
+
+
+    /** @TODO */
     // Retirer les anims, mettre les unites et la vague a null, enlever les event, vider les tableau de cibles à portée
+
 
   }
 
@@ -324,18 +352,18 @@ class Niveau {
    * @param {*} vague la  vague à lancer
    */
   lancerVague(temps, vague) {
-    for (const element of vague.unites) {
-      let animUnite = this.scene.beginAnimation(element.cibleMesh, 0, temps, false);
-      let animPortee = this.scene.beginAnimation(element.portee.porteeMesh, 0, temps, false);
-      element.animationUnite = animUnite;
-      element.animPortee = animPortee;
+    for (const unite of vague.unites) {
+      let animUnite = this.scene.beginAnimation(unite.cibleMesh, 0, temps, false);
+      let animPortee = this.scene.beginAnimation(unite.portee.porteeMesh, 0, temps, false);
+      unite.animationUnite = animUnite;
+      unite.animPortee = animPortee;
     }
   }
 
 
-  ciblerUnites(base, vague){
+  ciblerUnites(base, vague) {
     for (const unite of vague.unites) {
-      if(base.joueur != unite.joueur){
+      if (base.joueur != unite.joueur) {
         base.ViserCible(unite);
       }
     }

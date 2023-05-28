@@ -25,6 +25,8 @@ class UniteAbastract extends CibleAbstract {
         // statistique en plus des bases vus que les unités se déplacent
         // viesse max = 10, à prendre en compte lors des amélioration, si il est atteint bonus sur les autres stats ?
 
+        this.QuandMeurt = new BABYLON.Observable();
+
         this.animationUnite;
         this.animPortee;
     }
@@ -79,6 +81,7 @@ class UniteAbastract extends CibleAbstract {
         this.cibleMesh.dispose(true, true);
         this.portee.porteeMesh.dispose(true, true);
         super.Mourir();
+        this.QuandMeurt.notifyObservers();
     }
 
     /**
