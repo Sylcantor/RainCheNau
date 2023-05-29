@@ -12,6 +12,8 @@ class BasePrincipale extends BaseAbstract {
         //Statistiques
         super(cibleMesh, joueur, 25, 2, 2.5, 1);
         this.cibleMesh.showBoundingBox = true;
+
+        this.observerEtatBP = new BABYLON.Observable();
     }
 
     /**
@@ -23,6 +25,9 @@ class BasePrincipale extends BaseAbstract {
         joueur.augmenterMonnaie(20);
         //console.log(joueur.score)
         super.Mourir(joueur);
+
+        // indiquer que la bp est prise
+        this.observerEtatBP.notifyObservers();
     }
 
     //maj des stat en fonction de la difficulté du niveau

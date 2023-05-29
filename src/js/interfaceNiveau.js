@@ -20,6 +20,8 @@ class InterfaceNiveau {
   constructor(niveau, vague, vagueRestante, joueurHumain, difficulte) {
     this.joueurHumain = joueurHumain;
     this.difficulte = difficulte;
+    this.vague = vague;
+    this.vagueRestante = vagueRestante;
 
     // partie calcul cout/bonus des améliorations
     this.niveauAmeliorationNbUnite = 0;
@@ -37,6 +39,10 @@ class InterfaceNiveau {
     this.advancedTexture.addControl(this.CreerLabelEtConteneur("monnaie", this.joueurHumain.monnaie + ' or', "0", "150"));
     this.advancedTexture.addControl(this.CreerLabelEtConteneur("score", this.joueurHumain.score + " pts", "0", "300"));
     this.advancedTexture.addControl(this.CreerLabelEtConteneur("vague", vagueRestante + "/" + vague, "0", "450"));
+
+    this.descriptionVague;
+
+
 
 
     this.baseCliquee = null; // La base actuellement décrite
@@ -56,7 +62,7 @@ class InterfaceNiveau {
   }
 
   /**
-   * Calcul le cout d'une amélioration en fonctionn de son niveau
+   * Calcul le cout d'une amélioration en fonction de son niveau
    * @param {int} niveau 
    */
   calculerCout(niveau) {
@@ -75,11 +81,11 @@ class InterfaceNiveau {
   }
 
   calculBonusPV() {
-    return Number.parseFloat(0.2 + (0.75 * (this.niveauAmeliorationPv / (this.difficulte + 1)))).toFixed(2);
+    return 0.2 + (0.3 * (this.niveauAmeliorationPv / (this.difficulte + 1)));
   }
 
   calculBonusATK() {
-    return Number.parseFloat(0.1 + (0.2 * (this.niveauAmeliorationAtk / (this.difficulte + 1)))).toFixed(2);
+    return 0.1 + (0.2 * (this.niveauAmeliorationAtk / (this.difficulte + 1)));
   }
 
   /**
@@ -126,6 +132,8 @@ class InterfaceNiveau {
   //https://playground.babylonjs.com/#6GWUV3 tooltip 
   //https://www.babylonjs-playground.com/#XCPP9Y#2260 tooltip
   creerTooltip(parent, nom, texte) {
+    //console.log(nom)
+
     // creer et placer le tooltip en bas a coté des boutons
     this.advancedTexture.addControl(this.CreerLabelEtConteneur(nom, texte, "0", "0"));
     let rectangle = this.advancedTexture.getDescendants(false, control => control.name === 'conteneur_' + nom)[0];
@@ -138,6 +146,13 @@ class InterfaceNiveau {
     rectangle.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
     rectangle.top = -5 + "px";
     rectangle.left = -170 + "px";
+
+    if (nom == "previsualisation_attaque") {
+      this.descriptionVague = rectangle;
+    }
+
+
+
     this.advancedTexture.removeControl(rectangle);
 
 
@@ -159,8 +174,9 @@ class InterfaceNiveau {
    * @param {*} nomTooltip : le tooltip a màj
    * @param {*} texte : les nouvelles infos
    */
-  MajTooltip(nomTooltip, texte){
+  MajTooltip(nomTooltip, texte) {
     let label = this.advancedTexture.getDescendants(false, control => control.name === nomTooltip)[0];
+    //console.log(nomTooltip, label, this.advancedTexture.getDescendants());
     label.text = texte;
   }
 
@@ -176,27 +192,30 @@ class InterfaceNiveau {
     button.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
 
     // informations du tooltip
-    let prix = this.calculerCout(this.niveauAmeliorationNbUnite) * 5 * (this.difficulte+1);
+    let prix = this.calculerCout(this.niveauAmeliorationNbUnite) * 5 * (this.difficulte + 1);
     this.creerTooltip(button, "nb_unit_tooltip", "Ajoute une unité à chaque les vague \n Niveau : " + this.niveauAmeliorationNbUnite + "\n Effet : +" + this.calculBonusNbUnite() + " unité" + "\n cout améliotation : " + prix + " or");
 
     let interfaceJoueur = this;
     button.onPointerUpObservable.add(function () {
       interfaceJoueur.joueurHumain.bonusNbUnite += interfaceJoueur.calculBonusNbUnite();
 
-      let prixPrecedant = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationNbUnite) * 5 * (interfaceJoueur.difficulte+1);
+      let prixPrecedant = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationNbUnite) * 5 * (interfaceJoueur.difficulte + 1);
 
       interfaceJoueur.niveauAmeliorationNbUnite += 1;
-      
+
       // Maj des informations
-      prix = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationNbUnite) * 5 * (interfaceJoueur.difficulte+1);
-      interfaceJoueur.MajTooltip( "nb_unit_tooltip", "Ajoute une unité à chaque les vague \n Niveau : " + interfaceJoueur.niveauAmeliorationNbUnite + "\n Effet : +" + interfaceJoueur.calculBonusNbUnite() + " unité" + "\n cout améliotation : " + prix + " or");
-    
+      prix = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationNbUnite) * 5 * (interfaceJoueur.difficulte + 1);
+      interfaceJoueur.MajTooltip("nb_unit_tooltip", "Ajoute une unité à chaque les vague \n Niveau : " + interfaceJoueur.niveauAmeliorationNbUnite + "\n Effet : +" + interfaceJoueur.calculBonusNbUnite() + " unité" + "\n cout améliotation : " + prix + " or");
+
       interfaceJoueur.joueurHumain.baisserMonnaie(prixPrecedant);
+
+      // mise a jour de la prévisualisation de la vague
+      interfaceJoueur.MajInfoVague(interfaceJoueur);
     });
 
     this.advancedTexture.addControl(button);
     (this.joueurHumain.monnaie < prix) ? this.advancedTexture.getDescendants(true, control => control.name === "btnDupliquer")[0].isEnabled = false : this.advancedTexture.getDescendants(true, control => control.name === "btnDupliquer")[0].isEnabled = true;
-    
+
   }
 
 
@@ -212,7 +231,7 @@ class InterfaceNiveau {
     button.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
 
 
-    let prix = this.calculerCout(this.niveauAmeliorationAtk) * 2 * (this.difficulte+1);
+    let prix = this.calculerCout(this.niveauAmeliorationAtk) * 2 * (this.difficulte + 1);
     this.creerTooltip(button, "atk_tooltip", "Augmente la puissanse des unités \n Niveau : " + this.niveauAmeliorationAtk + "\n Effet : +" + this.calculBonusATK() + " attaque" + "\n cout améliotation : " + prix + " or");
 
 
@@ -220,15 +239,18 @@ class InterfaceNiveau {
     button.onPointerUpObservable.add(function () {
       interfaceJoueur.joueurHumain.bonusATK += interfaceJoueur.calculBonusATK();
 
-      let prixPrecedant = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationAtk) * 2 * (interfaceJoueur.difficulte+1);
-      
+      let prixPrecedant = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationAtk) * 2 * (interfaceJoueur.difficulte + 1);
+
 
       interfaceJoueur.niveauAmeliorationAtk += 1;
-      
+
       // Maj des informations
-      let prix = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationAtk) * 2 * (interfaceJoueur.difficulte+1);
-      interfaceJoueur.MajTooltip( "atk_tooltip", "Augmente la puissanse des unités \n Niveau : " + interfaceJoueur.niveauAmeliorationAtk + "\n Effet : +" + interfaceJoueur.calculBonusATK() + " attaque" + "\n cout améliotation : " + prix + " or");
+      let prix = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationAtk) * 2 * (interfaceJoueur.difficulte + 1);
+      interfaceJoueur.MajTooltip("atk_tooltip", "Augmente la puissanse des unités \n Niveau : " + interfaceJoueur.niveauAmeliorationAtk + "\n Effet : +" + parseFloat(interfaceJoueur.calculBonusATK()).toPrecision(3) + " attaque" + "\n cout améliotation : " + prix + " or");
       interfaceJoueur.joueurHumain.baisserMonnaie(prixPrecedant);
+
+      // mise a jour de la prévisualisation de la vague
+      interfaceJoueur.MajInfoVague(interfaceJoueur);
     });
 
     this.advancedTexture.addControl(button);
@@ -249,24 +271,27 @@ class InterfaceNiveau {
     button.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
 
 
-    let prix = this.calculerCout(this.niveauAmeliorationPv) * (this.difficulte+1);
+    let prix = this.calculerCout(this.niveauAmeliorationPv) * (this.difficulte + 1);
     this.creerTooltip(button, "pv_tooltip", "Augmente les points de vie des unités \n Niveau : " + this.niveauAmeliorationPv + "\n Effet : +" + this.calculBonusPV() + " pv" + "\n cout améliotation : " + prix + " or");
 
     let interfaceJoueur = this;
     button.onPointerUpObservable.add(function () {
-      interfaceJoueur.joueurHumain.bonusPV += interfaceJoueur.calculBonusATK();
+      interfaceJoueur.joueurHumain.bonusPV += interfaceJoueur.calculBonusPV();
 
-      let prixPrecedant = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationPv) * (interfaceJoueur.difficulte+1);
-      
+      let prixPrecedant = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationPv) * (interfaceJoueur.difficulte + 1);
+
 
       interfaceJoueur.niveauAmeliorationPv += 1;
-      
-      // Maj des informations
-      let prix = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationPv) * (interfaceJoueur.difficulte+1);
 
-      interfaceJoueur.MajTooltip( "pv_tooltip", "Augmente les points de vie des unités \n Niveau : " + interfaceJoueur.niveauAmeliorationPv + "\n Effet : +" + interfaceJoueur.calculBonusPV() + " pv" + "\n cout améliotation : " + prix + " or");
-      
+      // Maj des informations
+      let prix = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationPv) * (interfaceJoueur.difficulte + 1);
+
+      interfaceJoueur.MajTooltip("pv_tooltip", "Augmente les points de vie des unités \n Niveau : " + interfaceJoueur.niveauAmeliorationPv + "\n Effet : +" + parseFloat(interfaceJoueur.calculBonusPV()).toPrecision(3) + " pv" + "\n cout améliotation : " + prix + " or");
+
       interfaceJoueur.joueurHumain.baisserMonnaie(prixPrecedant);
+
+      // mise a jour de la prévisualisation de la vague
+      interfaceJoueur.MajInfoVague(interfaceJoueur);
     });
 
     this.advancedTexture.addControl(button);
@@ -370,10 +395,10 @@ class InterfaceNiveau {
     let panel = this.advancedTexture.getDescendants(true, control => control.name === 'BarreInfo')[0];
 
     panel.getChildByName("Selection").text = "Controleur : " + base.joueur.type.type;
-    panel.getChildByName("Pv").text = "Pv: " + base.pv + " / " + base.pvmax;
-    panel.getChildByName("Portee").text = "Portée: " + base.porteeStat;
-    panel.getChildByName("VitAtk").text = "Vitesse attaque: " + base.vitesseAttaque;
-    panel.getChildByName("Atk").text = "Attaque: " + base.attaque;
+    panel.getChildByName("Pv").text = "Pv: " + parseFloat(base.pv).toPrecision(3) + " / " + parseFloat(base.pvmax).toPrecision(3);
+    panel.getChildByName("Portee").text = "Portée: " + parseFloat(base.porteeStat).toPrecision(3);
+    panel.getChildByName("VitAtk").text = "Vitesse attaque: " + parseFloat(base.vitesseAttaque).toPrecision(3);
+    panel.getChildByName("Atk").text = "Attaque: " + parseFloat(base.attaque).toPrecision(3);
 
     (TypeJoueur.Joueur != base.joueur.type && this.peutLancerVague) ? panel.getChildByName("btnLancerVague").isEnabled = true : panel.getChildByName("btnLancerVague").isEnabled = false;
 
@@ -409,15 +434,33 @@ class InterfaceNiveau {
     // let btn = interfaceJoueur.advancedTexture.getDescendants(true, /*control => control.name === 'vague'*/ );
     // console.log(btn)
 
-    let prixunit = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationNbUnite) * 5 * (interfaceJoueur.difficulte+1);
+    let prixunit = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationNbUnite) * 5 * (interfaceJoueur.difficulte + 1);
     (interfaceJoueur.joueurHumain.monnaie < prixunit) ? interfaceJoueur.advancedTexture.getDescendants(true, control => control.name === "btnDupliquer")[0].isEnabled = false : interfaceJoueur.advancedTexture.getDescendants(true, control => control.name === "btnDupliquer")[0].isEnabled = true;
 
 
-    let prixatk = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationAtk) * 2 * (interfaceJoueur.difficulte+1);
+    let prixatk = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationAtk) * 2 * (interfaceJoueur.difficulte + 1);
     (interfaceJoueur.joueurHumain.monnaie < prixatk) ? interfaceJoueur.advancedTexture.getDescendants(true, control => control.name === "btnFusionner")[0].isEnabled = false : interfaceJoueur.advancedTexture.getDescendants(true, control => control.name === "btnFusionner")[0].isEnabled = true;
 
-    let prixpv = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationPv)  * (interfaceJoueur.difficulte+1);
+    let prixpv = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationPv) * (interfaceJoueur.difficulte + 1);
     (interfaceJoueur.joueurHumain.monnaie < prixpv) ? interfaceJoueur.advancedTexture.getDescendants(true, control => control.name === "btnFusionner2")[0].isEnabled = false : interfaceJoueur.advancedTexture.getDescendants(true, control => control.name === "btnFusionner2")[0].isEnabled = true;
+
+  }
+
+  /**
+   * Mise des informations pour prévisualiser une vague
+   * @param {InterfaceNiveau} interfaceJoueur 
+   */
+  MajInfoVague(interfaceJoueur) {
+    //console.log(interfaceJoueur.descriptionVague.getDescendants()[0].text)
+
+    interfaceJoueur.descriptionVague.getDescendants()[0].text = "Vague n°"
+      + (interfaceJoueur.vague - interfaceJoueur.vagueRestante + 1)
+      + "\n Nombre d'unité : "
+      + (interfaceJoueur.joueurHumain.bonusNbUnite == 0 ? 5 : 5 + interfaceJoueur.joueurHumain.bonusNbUnite)
+      + "\n Point de vie : "
+      + parseFloat(1 + interfaceJoueur.joueurHumain.bonusPV).toPrecision(3)
+      + "\n Attaque : "
+      + parseFloat(1 + interfaceJoueur.joueurHumain.bonusATK).toPrecision(3);
 
   }
 

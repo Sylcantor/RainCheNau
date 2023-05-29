@@ -38,7 +38,11 @@ class UniteAbastract extends CibleAbstract {
     * @returns {BABYLON.Animation} l'animation  à appliquer à l'unité
     */
     creerUniteAnimation(depart, points) {
-        const animation = new BABYLON.Animation("deplacementChemin", "position", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+        const animation = new BABYLON.Animation("deplacementChemin"
+                                                , "position"
+                                                , 30
+                                                , BABYLON.Animation.ANIMATIONTYPE_VECTOR3
+                                                , BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
         //Crée une animation de déplacement le long de la courbe
         const keyFrames = [];
         points.forEach((point, i) => {
@@ -96,8 +100,8 @@ class UniteAbastract extends CibleAbstract {
                 trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger,
                 parameter: base.cibleMesh
             }, (evt) => {
-                //this.cibles.push(cible); // ajouter une couvelle cible à la liste des cibles potentielles
-                if (this.cibleVerouillee == null || this.cibleVerouillee.joueur == this.joueur) { //attribue la 1ere cible ou verifie que la base actuellement ciblée à bien été capturée
+                //attribue la 1ere cible ou verifie que la base actuellement ciblée à bien été capturée
+                if (this.cibleVerouillee == null || this.cibleVerouillee.joueur == this.joueur) { 
                     this.Attaquer(base);
                 }
         }));

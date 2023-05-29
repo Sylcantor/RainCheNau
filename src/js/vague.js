@@ -23,7 +23,9 @@ class Vague {
          */
 
         this.cibles = basesCiblee;
-        this.resteUnite = nombeBasesJoueur * 5;
+
+        // bonus pour le nombre d'unités et multiplication par le nombre de bases controlées
+        this.resteUnite = joueur.bonusNbUnite == 0 ? 5 : 5 + (joueur.bonusNbUnite * nombeBasesJoueur);
 
         this.unites = this.creerUnites(joueur, chemin.splinePoints, this.resteUnite);
 

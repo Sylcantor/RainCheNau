@@ -23,8 +23,9 @@ class Niveau {
     this.nombreBasesSecondaire = difficulte + 1;
 
     this.labelNiveau = 1;
-    this.nombreVagueRestante = ((difficulte + 1) * 5) - (Math.floor(difficulte/1)); 
-    this.nombreVague = ((difficulte + 1) * 5) - (Math.floor(difficulte/1)); 
+    this.nombreVagueRestante = ((difficulte + 1) * 5) - (Math.floor(difficulte / 1));
+    this.nombreVague = ((difficulte + 1) * 5) - (Math.floor(difficulte / 1));
+
     //this.temps = 4;
     this.joueurs = [new Joueur(TypeJoueur.Joueur), new Joueur(TypeJoueur.Ia)];
 
@@ -37,6 +38,12 @@ class Niveau {
 
     this.configuration.scenes.push(this.scene);
     this.configureAssetManager();
+
+    // Observer
+    let instance = this;
+    this.basesPrincipales[1].observerEtatBP.add(() => {
+      instance.finNiveau(true);
+    });
 
   }
 
@@ -230,7 +237,9 @@ class Niveau {
   CreerBasesSecondaires() {
     let basesSecondaires = [];
     let i = 0;
-    let cylindre = BABYLON.MeshBuilder.CreateCylinder("cylinder", { height: 0.20, diameterTop: 0.25, diameterBottom: 0.25 });// le cube à clonner
+    let cylindre = BABYLON.MeshBuilder.CreateCylinder(
+      "cylinder"
+      , { height: 0.20, diameterTop: 0.25, diameterBottom: 0.25 });// le cube à clonner
     cylindre.material = new BABYLON.StandardMaterial("MatBS1");
 
     // points utilisables
@@ -292,7 +301,21 @@ class Niveau {
   controlScene() {
     //Bouton attaquer
     let panel = this.scene.interface.advancedTexture.getDescendants(true, control => control.name === 'BarreInfo')[0];
-    panel.getChildByName("btnLancerVague").onPointerUpObservable.add(() => this.CreerVague());
+    let btnVague = panel.getChildByName("btnLancerVague")
+    btnVague.onPointerUpObservable.add(() => this.CreerVague());
+
+    /** Prévisualisation de la vague */
+    this.scene.interface.creerTooltip(btnVague
+      , "previsualisation_attaque"
+      , "Vague n°"
+      + (this.nombreVague - this.nombreVagueRestante + 1)
+      + "\n Nombre d'unité : "
+      + (this.joueurs[0].bonusNbUnite == 0 ? 5 : 5 + this.joueurs[0].bonusNbUnite)
+      + "\n Point de vie : "
+      + (1 + this.joueurs[0].bonusPV)
+      + "\n Attaque : "
+      + (1 + this.joueurs[0].bonusATK))
+
   }
 
   /**
@@ -310,12 +333,17 @@ class Niveau {
     let nbvague = this.nombreVague;
     let nbVagueRestante = this.nombreVagueRestante;
 
-    let temps = Math.floor(this.chemin.splinePoints.length / 10) * 10000;// augmenter le temps avec les courbes plus longue pour éviter que l'annimation ne coupe au millieu
-    let cibles = this.basesPrincipales[1] != this.scene.interface.baseCliquee ? [this.scene.interface.baseCliquee, this.basesPrincipales[1]] : [this.basesPrincipales[1]]; // definir les cibles de la vague
+    // augmenter le temps avec les courbes plus longue pour éviter que l'annimation ne coupe au millieu
+    let temps = Math.floor(this.chemin.splinePoints.length / 10) * 10000;
+
+    // definir les cibles de la vague
+    let cibles = this.basesPrincipales[1] != this.scene.interface.baseCliquee
+      ? [this.scene.interface.baseCliquee, this.basesPrincipales[1]]
+      : [this.basesPrincipales[1]];
 
     let nbBasesJoueur = 1;
-    for (const base of this.basesSecondaires){
-      if (base.joueur == this.joueurs[0] ){
+    for (const base of this.basesSecondaires) {
+      if (base.joueur == this.joueurs[0]) {
         nbBasesJoueur += 1
       }
     }
@@ -324,11 +352,22 @@ class Niveau {
     let vague = new Vague(this.joueurs[0], nbBasesJoueur, cibles, this.chemin);
     this.lancerVague(temps, vague);
 
-    // Permettre de relancer une vague
+
+    // Toutes les unités sont mortes Permettre de lancer une nouvelle vague
+    let instance = this
     vague.quandResteUniteChangeEstAZero.add(() => {
       inter.peutLancerVague = true;
       panel.getChildByName("btnLancerVague").isEnabled = true;
       inter.MajNbVague(nbVagueRestante, nbvague);
+      inter.vagueRestante -= 1;
+      inter.MajInfoVague(inter);
+
+      instance.test();
+
+      if (nbVagueRestante < 1) {
+        instance.finNiveau(false);
+      }
+
     });
 
     //Les tours ennemies cibles les unites
@@ -341,6 +380,8 @@ class Niveau {
 
     /** @TODO */
     // Retirer les anims, mettre les unites et la vague a null, enlever les event, vider les tableau de cibles à portée
+
+    
 
 
   }
@@ -365,6 +406,23 @@ class Niveau {
       if (base.joueur != unite.joueur) {
         base.ViserCible(unite);
       }
+    }
+  }
+
+
+  test(){
+    // Dispose tout ce qui traine
+    console.log("fin vague");
+  }
+
+
+
+  finNiveau(etat) {
+    // Netoyer jeu
+    if (etat) {
+      console.log("Gagné")
+    } else {
+      console.log("Perdu")
     }
   }
 
