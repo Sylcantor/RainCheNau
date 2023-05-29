@@ -3,29 +3,84 @@
  */
 
 import { BaseAbstract } from "./baseAbstract.js";
+import { Joueur } from "./joueur.js";
 import { TypeJoueur } from "./typeJoueur.js";
 
 // Regarder la création de bouton avec des pixels au lieu de pourcentage pour voir comment l'interface réagit à le redimention
 class InterfaceNiveau {
+
   /**
-  * Constructeur
-  */
-  constructor(niveau, vague, vagueRestante, monnaie) {
+   * Constructeur
+   * @param {int} niveau : le niveau actuel
+   * @param {int} vague : le nombre de vague total du niveau
+   * @param {int} vagueRestante : le nombre de vague restantes du niveau
+   * @param {Joueur} joueurHumain : le joueur pour qui l'interface est créée
+   * @param {int} difficulte : la difficultée du niveau
+   */
+  constructor(niveau, vague, vagueRestante, joueurHumain, difficulte) {
+    this.joueurHumain = joueurHumain;
+    this.difficulte = difficulte;
+
+    // partie calcul cout/bonus des améliorations
+    this.niveauAmeliorationNbUnite = 0;
+    this.niveauAmeliorationAtk = 0;
+    this.niveauAmeliorationPv = 0;
+
     this.advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
     this.CreerBoutonPause();
     this.CreerBoutonDupliquer();
     this.CreerBoutonFusionner();
+    this.CreerBoutonFusionner2();
     this.CreerPanneauDescription();
 
     this.advancedTexture.addControl(this.CreerLabelEtConteneur("niveau", "lvl." + niveau, "0", "0"));
-    this.advancedTexture.addControl(this.CreerLabelEtConteneur("vague", vagueRestante + "/" + vague, "0", "150"));
-    this.advancedTexture.addControl(this.CreerLabelEtConteneur("monnaie", monnaie, "0", "300"));
+    this.advancedTexture.addControl(this.CreerLabelEtConteneur("monnaie", this.joueurHumain.monnaie + ' or', "0", "150"));
+    this.advancedTexture.addControl(this.CreerLabelEtConteneur("score", this.joueurHumain.score + " pts", "0", "300"));
+    this.advancedTexture.addControl(this.CreerLabelEtConteneur("vague", vagueRestante + "/" + vague, "0", "450"));
+
 
     this.baseCliquee = null; // La base actuellement décrite
     this.peutLancerVague = true; // eviter de lancer plusieurs vagues en meme temps
 
+    // ajout des observer
+    let interfaceJoueur = this;
+
+    this.joueurHumain.observerScore.add(() => {
+      interfaceJoueur.MajScore(interfaceJoueur);
+    });
+
+    this.joueurHumain.observerMonnaie.add(() => {
+      interfaceJoueur.MajMonnaie(interfaceJoueur);
+    });
+
   }
 
+  /**
+   * Calcul le cout d'une amélioration en fonctionn de son niveau
+   * @param {int} niveau 
+   */
+  calculerCout(niveau) {
+    let base = 5
+    if (niveau < 3) {
+      return 5 + niveau;
+    }
+    else if (niveau < 15) {
+      return 5 + niveau * 2;
+    }
+    return niveau * 7;
+  }
+
+  calculBonusNbUnite() {
+    return 1 + Math.trunc(0.1 * (this.niveauAmeliorationNbUnite / (this.difficulte + 1)))
+  }
+
+  calculBonusPV() {
+    return Number.parseFloat(0.2 + (0.75 * (this.niveauAmeliorationPv / (this.difficulte + 1)))).toFixed(2);
+  }
+
+  calculBonusATK() {
+    return Number.parseFloat(0.1 + (0.2 * (this.niveauAmeliorationAtk / (this.difficulte + 1)))).toFixed(2);
+  }
 
   /**
    * Crée un bouton
@@ -67,20 +122,81 @@ class InterfaceNiveau {
     this.advancedTexture.addControl(button);
   }
 
+
+  //https://playground.babylonjs.com/#6GWUV3 tooltip 
+  //https://www.babylonjs-playground.com/#XCPP9Y#2260 tooltip
+  creerTooltip(parent, nom, texte) {
+    // creer et placer le tooltip en bas a coté des boutons
+    this.advancedTexture.addControl(this.CreerLabelEtConteneur(nom, texte, "0", "0"));
+    let rectangle = this.advancedTexture.getDescendants(false, control => control.name === 'conteneur_' + nom)[0];
+    rectangle.width = "400px";
+    rectangle.height = "150px";
+    let label = this.advancedTexture.getDescendants(false, control => control.name === nom)[0];
+    label.width = "400px";
+    label.height = "150px";
+    rectangle.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+    rectangle.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+    rectangle.top = -5 + "px";
+    rectangle.left = -170 + "px";
+    this.advancedTexture.removeControl(rectangle);
+
+
+    let interfaceJoueur = this;
+    parent.onPointerEnterObservable.add(function () {
+      interfaceJoueur.advancedTexture.addControl(rectangle);
+
+    });
+
+    parent.onPointerOutObservable.add(function () {
+      let rectangle = interfaceJoueur.advancedTexture.getDescendants(false, control => control.name === 'conteneur_' + nom)[0];
+      interfaceJoueur.advancedTexture.removeControl(rectangle);
+    });
+
+  }
+
+  /**
+   * Met a jours les informations du tooltip
+   * @param {*} nomTooltip : le tooltip a màj
+   * @param {*} texte : les nouvelles infos
+   */
+  MajTooltip(nomTooltip, texte){
+    let label = this.advancedTexture.getDescendants(false, control => control.name === nomTooltip)[0];
+    label.text = texte;
+  }
+
   /**
    * Crée le bouton duplication de carte et ajoute les controle
    */
   CreerBoutonDupliquer() {
-    let button = this.CreerBouton("btnDupliquer", "Dupliquer", "-10", "-10");
+    //let button = this.CreerBouton("btnDupliquer", "Dupliquer", "-10", "-10");
+    let button = this.CreerBouton("btnDupliquer", "nombre", "-10", "-10");
 
     //Placement en bas à droite
     button.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
     button.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
 
+    // informations du tooltip
+    let prix = this.calculerCout(this.niveauAmeliorationNbUnite) * 5 * (this.difficulte+1);
+    this.creerTooltip(button, "nb_unit_tooltip", "Ajoute une unité à chaque les vague \n Niveau : " + this.niveauAmeliorationNbUnite + "\n Effet : +" + this.calculBonusNbUnite() + " unité" + "\n cout améliotation : " + prix + " or");
+
+    let interfaceJoueur = this;
     button.onPointerUpObservable.add(function () {
-      console.log("code bouton dupliquer");
+      interfaceJoueur.joueurHumain.bonusNbUnite += interfaceJoueur.calculBonusNbUnite();
+
+      let prixPrecedant = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationNbUnite) * 5 * (interfaceJoueur.difficulte+1);
+
+      interfaceJoueur.niveauAmeliorationNbUnite += 1;
+      
+      // Maj des informations
+      prix = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationNbUnite) * 5 * (interfaceJoueur.difficulte+1);
+      interfaceJoueur.MajTooltip( "nb_unit_tooltip", "Ajoute une unité à chaque les vague \n Niveau : " + interfaceJoueur.niveauAmeliorationNbUnite + "\n Effet : +" + interfaceJoueur.calculBonusNbUnite() + " unité" + "\n cout améliotation : " + prix + " or");
+    
+      interfaceJoueur.joueurHumain.baisserMonnaie(prixPrecedant);
     });
+
     this.advancedTexture.addControl(button);
+    (this.joueurHumain.monnaie < prix) ? this.advancedTexture.getDescendants(true, control => control.name === "btnDupliquer")[0].isEnabled = false : this.advancedTexture.getDescendants(true, control => control.name === "btnDupliquer")[0].isEnabled = true;
+    
   }
 
 
@@ -88,16 +204,73 @@ class InterfaceNiveau {
    * Crée le bouton fusion de carte et ajoute les controle
    */
   CreerBoutonFusionner() {
-    let button = this.CreerBouton("btnFusionner", "Fusioner", "-60", "-10");
+    //let button = this.CreerBouton("btnFusionner", "Fusioner", "-60", "-10");
+    let button = this.CreerBouton("btnFusionner", "attaque", "-60", "-10");
 
     //Placement en bas à droite
     button.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
     button.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
 
+
+    let prix = this.calculerCout(this.niveauAmeliorationAtk) * 2 * (this.difficulte+1);
+    this.creerTooltip(button, "atk_tooltip", "Augmente la puissanse des unités \n Niveau : " + this.niveauAmeliorationAtk + "\n Effet : +" + this.calculBonusATK() + " attaque" + "\n cout améliotation : " + prix + " or");
+
+
+    let interfaceJoueur = this;
     button.onPointerUpObservable.add(function () {
-      console.log("code bouton fusionner");
+      interfaceJoueur.joueurHumain.bonusATK += interfaceJoueur.calculBonusATK();
+
+      let prixPrecedant = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationAtk) * 2 * (interfaceJoueur.difficulte+1);
+      
+
+      interfaceJoueur.niveauAmeliorationAtk += 1;
+      
+      // Maj des informations
+      let prix = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationAtk) * 2 * (interfaceJoueur.difficulte+1);
+      interfaceJoueur.MajTooltip( "atk_tooltip", "Augmente la puissanse des unités \n Niveau : " + interfaceJoueur.niveauAmeliorationAtk + "\n Effet : +" + interfaceJoueur.calculBonusATK() + " attaque" + "\n cout améliotation : " + prix + " or");
+      interfaceJoueur.joueurHumain.baisserMonnaie(prixPrecedant);
     });
+
     this.advancedTexture.addControl(button);
+    (this.joueurHumain.monnaie < prix) ? this.advancedTexture.getDescendants(true, control => control.name === "btnFusionner")[0].isEnabled = false : this.advancedTexture.getDescendants(true, control => control.name === "btnFusionner")[0].isEnabled = true;
+  }
+
+
+  /**
+  * Crée le bouton fusion de carte et ajoute les controle
+  */
+  /**@TODO a retirer pour les cartes */
+  CreerBoutonFusionner2() {
+    //let button = this.CreerBouton("btnFusionner", "Fusioner", "-60", "-10");
+    let button = this.CreerBouton("btnFusionner2", "point vie", "-110", "-10");
+
+    //Placement en bas à droite
+    button.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+    button.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+
+
+    let prix = this.calculerCout(this.niveauAmeliorationPv) * (this.difficulte+1);
+    this.creerTooltip(button, "pv_tooltip", "Augmente les points de vie des unités \n Niveau : " + this.niveauAmeliorationPv + "\n Effet : +" + this.calculBonusPV() + " pv" + "\n cout améliotation : " + prix + " or");
+
+    let interfaceJoueur = this;
+    button.onPointerUpObservable.add(function () {
+      interfaceJoueur.joueurHumain.bonusPV += interfaceJoueur.calculBonusATK();
+
+      let prixPrecedant = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationPv) * (interfaceJoueur.difficulte+1);
+      
+
+      interfaceJoueur.niveauAmeliorationPv += 1;
+      
+      // Maj des informations
+      let prix = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationPv) * (interfaceJoueur.difficulte+1);
+
+      interfaceJoueur.MajTooltip( "pv_tooltip", "Augmente les points de vie des unités \n Niveau : " + interfaceJoueur.niveauAmeliorationPv + "\n Effet : +" + interfaceJoueur.calculBonusPV() + " pv" + "\n cout améliotation : " + prix + " or");
+      
+      interfaceJoueur.joueurHumain.baisserMonnaie(prixPrecedant);
+    });
+
+    this.advancedTexture.addControl(button);
+    (this.joueurHumain.monnaie < prix) ? this.advancedTexture.getDescendants(true, control => control.name === "btnFusionner2")[0].isEnabled = false : this.advancedTexture.getDescendants(true, control => control.name === "btnFusionner2")[0].isEnabled = true;
   }
 
 
@@ -128,7 +301,7 @@ class InterfaceNiveau {
   CreerLabelEtConteneur(nomLabel, texte, top, left) {
     var label = this.CreerLabel(nomLabel, texte);
 
-    var rectangle = new BABYLON.GUI.Rectangle("conteneur_"+nomLabel);
+    var rectangle = new BABYLON.GUI.Rectangle("conteneur_" + nomLabel);
     rectangle.width = "150px";
     rectangle.height = "40px";
 
@@ -143,7 +316,7 @@ class InterfaceNiveau {
     rectangle.color = "black";
     rectangle.thickness = 4;
     rectangle.background = "green";
-    
+
     rectangle.addControl(label);
     return rectangle;
   }
@@ -176,7 +349,7 @@ class InterfaceNiveau {
     panel.color = "black";
     panel.thickness = 4;
     panel.background = "green";
-  
+
     this.advancedTexture.addControl(panel);
     panel.addControl(labelSelection);
     panel.addControl(labelPv);
@@ -196,14 +369,14 @@ class InterfaceNiveau {
 
     let panel = this.advancedTexture.getDescendants(true, control => control.name === 'BarreInfo')[0];
 
-    panel.getChildByName("Selection").text = "base de : " + base.joueur.type.type;
+    panel.getChildByName("Selection").text = "Controleur : " + base.joueur.type.type;
     panel.getChildByName("Pv").text = "Pv: " + base.pv + " / " + base.pvmax;
     panel.getChildByName("Portee").text = "Portée: " + base.porteeStat;
     panel.getChildByName("VitAtk").text = "Vitesse attaque: " + base.vitesseAttaque;
     panel.getChildByName("Atk").text = "Attaque: " + base.attaque;
 
-    (TypeJoueur.Joueur != base.joueur.type && this.peutLancerVague)? panel.getChildByName("btnLancerVague").isEnabled = true : panel.getChildByName("btnLancerVague").isEnabled = false;
-    
+    (TypeJoueur.Joueur != base.joueur.type && this.peutLancerVague) ? panel.getChildByName("btnLancerVague").isEnabled = true : panel.getChildByName("btnLancerVague").isEnabled = false;
+
   }
 
   /**
@@ -211,10 +384,43 @@ class InterfaceNiveau {
    * @param {int} vagueRestante 
    * @param {int} vague 
    */
-  MajNbVague(vagueRestante, vague){
+  MajNbVague(vagueRestante, vague) {
     let label = this.advancedTexture.getDescendants(false, control => control.name === 'vague')[0];
     label.text = vagueRestante + "/" + vague;
   }
+
+  /**
+   * Mise a jour du score
+   * @param {InterfaceNiveau} interfaceJoueur 
+   */
+  MajScore(interfaceJoueur) {
+    let label = interfaceJoueur.advancedTexture.getDescendants(false, control => control.name === 'score')[0];
+    label.text = interfaceJoueur.joueurHumain.score + " pts";
+  }
+
+  /**
+   * Mise a jour lié à la monnaie
+   * @param {InterfaceNiveau} interfaceJoueur 
+   */
+  MajMonnaie(interfaceJoueur) {
+    let label = interfaceJoueur.advancedTexture.getDescendants(false, control => control.name === 'monnaie')[0];
+    label.text = interfaceJoueur.joueurHumain.monnaie + " or";
+
+    // let btn = interfaceJoueur.advancedTexture.getDescendants(true, /*control => control.name === 'vague'*/ );
+    // console.log(btn)
+
+    let prixunit = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationNbUnite) * 5 * (interfaceJoueur.difficulte+1);
+    (interfaceJoueur.joueurHumain.monnaie < prixunit) ? interfaceJoueur.advancedTexture.getDescendants(true, control => control.name === "btnDupliquer")[0].isEnabled = false : interfaceJoueur.advancedTexture.getDescendants(true, control => control.name === "btnDupliquer")[0].isEnabled = true;
+
+
+    let prixatk = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationAtk) * 2 * (interfaceJoueur.difficulte+1);
+    (interfaceJoueur.joueurHumain.monnaie < prixatk) ? interfaceJoueur.advancedTexture.getDescendants(true, control => control.name === "btnFusionner")[0].isEnabled = false : interfaceJoueur.advancedTexture.getDescendants(true, control => control.name === "btnFusionner")[0].isEnabled = true;
+
+    let prixpv = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationPv)  * (interfaceJoueur.difficulte+1);
+    (interfaceJoueur.joueurHumain.monnaie < prixpv) ? interfaceJoueur.advancedTexture.getDescendants(true, control => control.name === "btnFusionner2")[0].isEnabled = false : interfaceJoueur.advancedTexture.getDescendants(true, control => control.name === "btnFusionner2")[0].isEnabled = true;
+
+  }
+
 
 }
 export { InterfaceNiveau };

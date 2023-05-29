@@ -14,6 +14,17 @@ class BaseSecondaire extends BaseAbstract{
 
     }
 
+    /**
+     * action à la mort d'une base secondaire
+     * @param {Joueur} joueur le joueur dont le projectile mis a 0- les pv de la base
+     */
+    Mourir(joueur){
+        joueur.augmenterScore(50);
+        joueur.augmenterMonnaie(10);
+        //console.log(joueur.score)
+        super.Mourir(joueur);
+
+    }
     //maj des stat en fonction de la difficulté du niveau
     //maj des stat chaque tours
     //emplacements

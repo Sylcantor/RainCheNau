@@ -26,7 +26,6 @@ class Niveau {
     this.nombreVagueRestante = ((difficulte + 1) * 5) - (Math.floor(difficulte/1)); 
     this.nombreVague = ((difficulte + 1) * 5) - (Math.floor(difficulte/1)); 
     //this.temps = 4;
-    this.monnaie = 0;
     this.joueurs = [new Joueur(TypeJoueur.Joueur), new Joueur(TypeJoueur.Ia)];
 
 
@@ -34,7 +33,7 @@ class Niveau {
     this.gl = new BABYLON.GlowLayer("glow"); //permet de faire briller les mesh des bases
 
     // Interface graphique
-    this.scene.interface = new InterfaceNiveau(this.labelNiveau, this.nombreVague, this.nombreVagueRestante, this.monnaie);
+    this.scene.interface = new InterfaceNiveau(this.labelNiveau, this.nombreVague, this.nombreVagueRestante, this.joueurs[0], difficulte);
 
     this.configuration.scenes.push(this.scene);
     this.configureAssetManager();

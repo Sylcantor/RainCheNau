@@ -81,6 +81,7 @@ class UniteAbastract extends CibleAbstract {
         this.cibleMesh.dispose(true, true);
         this.portee.porteeMesh.dispose(true, true);
         super.Mourir();
+        this.joueur.augmenterMonnaie(1);
         this.QuandMeurt.notifyObservers();
     }
 
