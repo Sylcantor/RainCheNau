@@ -12,20 +12,15 @@ class Vague {
     /**
      * Constructeur
      * @param {Joueur} joueur Le joueur attaquant
-     * @param {int} nombeBasesJoueur le nombre de bases du joueur attaquant
+     * @param {int} nombreBasesJoueur le nombre de bases du joueur attaquant
      * @param {BaseAbstract[]} basesCiblee la ou les base ciblée par le joueur
      * @param {Chemin} chemin le chemin de la partie
      */
-    constructor(joueur, nombeBasesJoueur, basesCiblee, chemin) {
-
-        /**
-         * @Todo : recupérer les stats des unités à générer à partir des cartes dans les emplacement des bases du joueur attaquant
-         */
+    constructor(joueur, nombreBasesJoueur, basesCiblee, chemin) {
 
         this.cibles = basesCiblee;
 
-        // bonus pour le nombre d'unités et multiplication par le nombre de bases controlées
-        this.resteUnite = joueur.bonusNbUnite == 0 ? 5 : 5 + (joueur.bonusNbUnite * nombeBasesJoueur);
+        this.resteUnite = 5  + joueur.nombreBase + joueur.bonusNbUnite
 
         this.unites = this.creerUnites(joueur, chemin.splinePoints, this.resteUnite);
 

@@ -27,9 +27,6 @@ class Niveau {
     this.nombreVagueRestante = ((difficulte + 1) * 5) - (Math.floor(difficulte / 1));
     this.nombreVague = ((difficulte + 1) * 5) - (Math.floor(difficulte / 1));
 
-    // this.nombreVagueRestante = 1;
-    // this.nombreVague = 1;
-
     this.joueurs = [(joueur == null ) ? new Joueur(TypeJoueur.Joueur) : joueur, new Joueur(TypeJoueur.Ia)];
 
 
@@ -315,7 +312,7 @@ class Niveau {
       , "Vague n°"
       + (this.nombreVague - this.nombreVagueRestante + 1)
       + "\n Nombre d'unité : "
-      + (this.joueurs[0].bonusNbUnite == 0 ? 5 : 5 + this.joueurs[0].bonusNbUnite)
+      + (5  + this.joueurs[0].nombreBase + this.joueurs[0].bonusNbUnite)
       + "\n Point de vie : "
       + (1 + this.joueurs[0].bonusPV)
       + "\n Attaque : "
@@ -362,7 +359,8 @@ class Niveau {
     let instance = this
     vague.quandResteUniteChangeEstAZero.add(() => {
       inter.peutLancerVague = true;
-      panel.getChildByName("btnLancerVague").isEnabled = true;
+      //panel.getChildByName("btnLancerVague").isEnabled = true;
+      inter.MAJPanneauDescription(inter.baseCliquee);
       inter.MajNbVague(nbVagueRestante, nbvague);
       inter.vagueRestante -= 1;
       inter.MajInfoVague(inter);
@@ -427,7 +425,7 @@ class Niveau {
     
     this.joueurs[0].retirerObserver();
     this.configuration.createNewEngine();
-    new FinLvl(this.configuration, this.difficulte, this.joueurs[0], this.labelNiveau);
+    new FinLvl(this.configuration, this.difficulte, this.joueurs[0], this.labelNiveau, this.nombreVagueRestante, etat);
   }
 
 }

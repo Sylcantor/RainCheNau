@@ -39,7 +39,6 @@ class CibleAbstract {
          */
 
         this.peutTirer = false;
-
     }
 
 

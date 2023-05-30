@@ -287,7 +287,7 @@ class InterfaceNiveau {
 
       // Maj des informations
       let prix = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationPv) * (interfaceJoueur.difficulte + 1);
-      
+
       interfaceJoueur.MajTooltip("pv_tooltip", "Augmente les points de vie des unités \n Niveau : " + interfaceJoueur.niveauAmeliorationPv + "\n Effet : +" + parseFloat(interfaceJoueur.calculBonusPV()).toPrecision(3) + " pv" + "\n cout améliotation : " + prix + " or");
 
       interfaceJoueur.joueurHumain.baisserMonnaie(prixPrecedant);
@@ -396,13 +396,19 @@ class InterfaceNiveau {
 
     let panel = this.advancedTexture.getDescendants(true, control => control.name === 'BarreInfo')[0];
 
-    panel.getChildByName("Selection").text = "Controleur : " + base.joueur.type.type;
-    panel.getChildByName("Pv").text = "Pv: " + parseFloat(base.pv).toPrecision(3) + " / " + parseFloat(base.pvmax).toPrecision(3);
-    panel.getChildByName("Portee").text = "Portée: " + parseFloat(base.porteeStat).toPrecision(3);
-    panel.getChildByName("VitAtk").text = "Vitesse attaque: " + parseFloat(base.vitesseAttaque).toPrecision(3);
-    panel.getChildByName("Atk").text = "Attaque: " + parseFloat(base.attaque).toPrecision(3);
+    if (panel != undefined) {// pas le temps de corriger ce bug au niveau des projectiles qui touchent leurs cible alors que le niveau est fini
+      panel.getChildByName("Selection").text = "Controleur : " + base.joueur.type.type;
+      panel.getChildByName("Pv").text = "Pv: " + parseFloat(base.pv).toPrecision(3) + " / " + parseFloat(base.pvmax).toPrecision(3);
+      panel.getChildByName("Portee").text = "Portée: " + parseFloat(base.porteeStat).toPrecision(3);
+      panel.getChildByName("VitAtk").text = "Vitesse attaque: " + parseFloat(base.vitesseAttaque).toPrecision(3);
+      panel.getChildByName("Atk").text = "Attaque: " + parseFloat(base.attaque).toPrecision(3);
 
-    (TypeJoueur.Joueur != base.joueur.type && this.peutLancerVague) ? panel.getChildByName("btnLancerVague").isEnabled = true : panel.getChildByName("btnLancerVague").isEnabled = false;
+      // console.log(TypeJoueur.Joueur);
+      // console.log(base.joueur.type);
+
+
+      ((TypeJoueur.Joueur != base.joueur.type) && this.peutLancerVague) ? panel.getChildByName("btnLancerVague").isEnabled = true : panel.getChildByName("btnLancerVague").isEnabled = false;
+    }
 
   }
 
@@ -450,12 +456,15 @@ class InterfaceNiveau {
    * @param {InterfaceNiveau} interfaceJoueur 
    */
   MajInfoVague(interfaceJoueur) {
-    //console.log(interfaceJoueur.descriptionVague.getDescendants()[0].text)
+    // console.log((5  + interfaceJoueur.joueurHumain.nombreBase + interfaceJoueur.joueurHumain.bonusNbUnite))
+    // console.log(interfaceJoueur.joueurHumain.nombreBase)
+    // console.log(interfaceJoueur.joueurHumain.bonusNbUnite)
+
 
     interfaceJoueur.descriptionVague.getDescendants()[0].text = "Vague n°"
       + (interfaceJoueur.vague - interfaceJoueur.vagueRestante + 1)
       + "\n Nombre d'unité : "
-      + (interfaceJoueur.joueurHumain.bonusNbUnite == 0 ? 5 : 5 + interfaceJoueur.joueurHumain.bonusNbUnite)
+      + (5  + interfaceJoueur.joueurHumain.nombreBase + interfaceJoueur.joueurHumain.bonusNbUnite)
       + "\n Point de vie : "
       + parseFloat(1 + interfaceJoueur.joueurHumain.bonusPV).toPrecision(3)
       + "\n Attaque : "

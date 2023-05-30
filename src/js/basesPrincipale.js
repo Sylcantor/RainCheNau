@@ -10,7 +10,7 @@ class BasePrincipale extends BaseAbstract {
     */
     constructor(cibleMesh, joueur, difficulte) {
         //Statistiques
-        super(cibleMesh, joueur, 25*(1+0.25*difficulte), 2*(1+0.25*difficulte), 2.5*(1+0.25*difficulte), 1*(1+0.25*difficulte));
+        super(cibleMesh, joueur, 25*(1+0.25*difficulte), 2*(1+0.25*difficulte), 2.5*(1+0.1*difficulte), 1*(1+0.25*difficulte));
 
         
         this.cibleMesh.showBoundingBox = true;

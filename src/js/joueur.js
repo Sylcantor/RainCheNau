@@ -23,6 +23,8 @@ class Joueur {
         this.bonusATK = 0;
         this.bonusPV = 0;
 
+        this.nombreBase = 1;
+
         this.couleur = (this.type == TypeJoueur.Joueur) ? BABYLON.Color3.Green() : this.CouleurAleatoire();
 
         this.observerScore = new BABYLON.Observable();

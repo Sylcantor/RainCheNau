@@ -9,14 +9,17 @@ class FinLvl {
      * Constructeur
      * @param {*} configuration : configuration du projet
      */
-    constructor(configuration, difficulte, joueur, labelNiveau) {
+    constructor(configuration, difficulte, joueur, labelNiveau, vague, etat) {
         this.configuration = configuration;
         this.scene = new BABYLON.Scene(configuration.engine);  //  Creates a basic Babylon Scene object
         this.configuration.scenes.push(this.scene)// Mettre la scene en 1er dans la liste
 
         this.difficulte = difficulte;
         this.joueur = joueur;
+        this.joueur.nombreBase = 1;
         this.labelNiveau = labelNiveau;
+        this.etat= etat;
+        this.vague = vague;
 
         this.configureAssetManager();  //  Configure la scene et affiche le rendu à interval réguliers
 
@@ -104,9 +107,10 @@ class FinLvl {
 
         btnJouer.onPointerUpObservable.add(() => {
             this.configuration.createNewEngine();
-            new Niveau(this.configuration, this.difficulte+1 , this.joueur, this.labelNiveau+1);
+            new Niveau(this.configuration, this.difficulte + (0.2*(this.vague+1)) , this.joueur, this.labelNiveau+1);
 
         });
+        btnJouer.isEnabled = this.etat;
 
         btnQuitter.onPointerUpObservable.add(() => {
             this.configuration.createNewEngine();

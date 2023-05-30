@@ -136,6 +136,9 @@ class BaseAbstract extends CibleAbstract {
             //console.log("la base"+this.cibleMesh.name,"change de joueur")
             this.pv = this.pvmax;
             this.joueur = joueur;
+
+            this.joueur.nombreBase += 1; //////////
+
             this.cibleMesh.material.emissiveColor = this.joueur.couleur;
             this.unitesaPortee = []
             this.MettreAjourCouleur();
