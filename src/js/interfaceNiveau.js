@@ -214,7 +214,8 @@ class InterfaceNiveau {
     });
 
     this.advancedTexture.addControl(button);
-    (this.joueurHumain.monnaie < prix) ? this.advancedTexture.getDescendants(true, control => control.name === "btnDupliquer")[0].isEnabled = false : this.advancedTexture.getDescendants(true, control => control.name === "btnDupliquer")[0].isEnabled = true;
+    //(this.joueurHumain.monnaie < prix) ? this.advancedTexture.getDescendants(true, control => control.name === "btnDupliquer")[0].isEnabled = false : this.advancedTexture.getDescendants(true, control => control.name === "btnDupliquer")[0].isEnabled = true;
+    (this.joueurHumain.monnaie < prix) ? button.isEnabled = false : button.isEnabled = true;
 
   }
 
@@ -272,6 +273,7 @@ class InterfaceNiveau {
 
 
     let prix = this.calculerCout(this.niveauAmeliorationPv) * (this.difficulte + 1);
+    //console.log(prix);
     this.creerTooltip(button, "pv_tooltip", "Augmente les points de vie des unités \n Niveau : " + this.niveauAmeliorationPv + "\n Effet : +" + this.calculBonusPV() + " pv" + "\n cout améliotation : " + prix + " or");
 
     let interfaceJoueur = this;
@@ -285,7 +287,7 @@ class InterfaceNiveau {
 
       // Maj des informations
       let prix = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationPv) * (interfaceJoueur.difficulte + 1);
-
+      
       interfaceJoueur.MajTooltip("pv_tooltip", "Augmente les points de vie des unités \n Niveau : " + interfaceJoueur.niveauAmeliorationPv + "\n Effet : +" + parseFloat(interfaceJoueur.calculBonusPV()).toPrecision(3) + " pv" + "\n cout améliotation : " + prix + " or");
 
       interfaceJoueur.joueurHumain.baisserMonnaie(prixPrecedant);
@@ -430,9 +432,6 @@ class InterfaceNiveau {
   MajMonnaie(interfaceJoueur) {
     let label = interfaceJoueur.advancedTexture.getDescendants(false, control => control.name === 'monnaie')[0];
     label.text = interfaceJoueur.joueurHumain.monnaie + " or";
-
-    // let btn = interfaceJoueur.advancedTexture.getDescendants(true, /*control => control.name === 'vague'*/ );
-    // console.log(btn)
 
     let prixunit = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationNbUnite) * 5 * (interfaceJoueur.difficulte + 1);
     (interfaceJoueur.joueurHumain.monnaie < prixunit) ? interfaceJoueur.advancedTexture.getDescendants(true, control => control.name === "btnDupliquer")[0].isEnabled = false : interfaceJoueur.advancedTexture.getDescendants(true, control => control.name === "btnDupliquer")[0].isEnabled = true;

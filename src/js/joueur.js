@@ -58,6 +58,7 @@ class Joueur {
     */
     augmenterMonnaie(nb) {
         this.monnaie += nb;
+        //console.log(this.monnaie)
         this.observerMonnaie.notifyObservers();
     }
 
@@ -68,6 +69,13 @@ class Joueur {
     baisserMonnaie(nb) {
         this.monnaie -= nb;
         this.observerMonnaie.notifyObservers();
+    }
+
+    retirerObserver(){
+
+        this.observerMonnaie.clear();
+        this.observerScore.clear()
+
     }
 
 }

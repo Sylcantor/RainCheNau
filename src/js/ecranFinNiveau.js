@@ -1,22 +1,26 @@
 import { Niveau } from './niveau.js';
+import { SceneParDefaut } from "./menu.js";
 /**
  * La scene de présentation du playground de babylon.js
  */
-class SceneParDefaut {
+class FinLvl {
 
     /**
      * Constructeur
      * @param {*} configuration : configuration du projet
      */
-    constructor(configuration) {
+    constructor(configuration, difficulte, joueur, labelNiveau) {
         this.configuration = configuration;
         this.scene = new BABYLON.Scene(configuration.engine);  //  Creates a basic Babylon Scene object
         this.configuration.scenes.push(this.scene)// Mettre la scene en 1er dans la liste
 
+        this.difficulte = difficulte;
+        this.joueur = joueur;
+        this.labelNiveau = labelNiveau;
+
         this.configureAssetManager();  //  Configure la scene et affiche le rendu à interval réguliers
 
     }
-//type="module"
 
     /**
      * Configurer tout les eléménts de la scene et recharger régulierement le rendu scene
@@ -86,27 +90,46 @@ class SceneParDefaut {
         light.intensity = 0.7;
     }
 
+
     /**
      * Créer l'interface graphique
      */
     creerInterface() {
         var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
-        var btnJouer = BABYLON.GUI.Button.CreateSimpleButton("btnJouer", "jouer");
-        btnJouer.width = "150px";
-        btnJouer.height = "40px";
-        btnJouer.color = "white";
-        btnJouer.cornerRadius = 20;
-        btnJouer.background = "blue";
+        let btnJouer = this.CreerBtn("N_suiv", "Niveau suivant");
+        let btnQuitter = this.CreerBtn("to_Menu", "Quitter");
+
+        btnQuitter.left = "150px"
 
         btnJouer.onPointerUpObservable.add(() => {
             this.configuration.createNewEngine();
-            new Niveau(this.configuration,0);
+            new Niveau(this.configuration, this.difficulte+1 , this.joueur, this.labelNiveau+1);
 
         });
+
+        btnQuitter.onPointerUpObservable.add(() => {
+            this.configuration.createNewEngine();
+            new SceneParDefaut(this.configuration);
+
+        });
+
+
         advancedTexture.addControl(btnJouer);
+        advancedTexture.addControl(btnQuitter);
+    }
+
+    CreerBtn(nom, texte){
+        var btn = BABYLON.GUI.Button.CreateSimpleButton(nom,texte);
+        btn.width = "150px";
+        btn.height = "40px";
+        btn.color = "white";
+        btn.cornerRadius = 20;
+        btn.background = "blue";
+
+        return btn
     }
 
 
 }
-export { SceneParDefaut };
+export { FinLvl };

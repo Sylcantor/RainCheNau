@@ -5,6 +5,7 @@ import { InterfaceNiveau } from "./interfaceNiveau.js";
 import { Joueur } from "./joueur.js";
 import { TypeJoueur } from "./typeJoueur.js";
 import { Vague } from "./vague.js";
+import { FinLvl } from "./ecranFinNiveau.js";
 
 /**
  * Affichage et gestion d'un niveau
@@ -16,18 +17,21 @@ class Niveau {
    * @param {*} configuration 
    * @param {int} difficulte : la difficulte du niveau à créer
    */
-  constructor(configuration, difficulte) {
+  constructor(configuration, difficulte, joueur = null, labelniveau = 1) {
     this.configuration = configuration;
     this.difficulte = difficulte;
     this.tailleSkybox = 1000;
     this.nombreBasesSecondaire = difficulte + 1;
 
-    this.labelNiveau = 1;
+    this.labelNiveau = labelniveau;
     this.nombreVagueRestante = ((difficulte + 1) * 5) - (Math.floor(difficulte / 1));
     this.nombreVague = ((difficulte + 1) * 5) - (Math.floor(difficulte / 1));
 
+
     //this.temps = 4;
-    this.joueurs = [new Joueur(TypeJoueur.Joueur), new Joueur(TypeJoueur.Ia)];
+    //console.log(joueur)
+    this.joueurs = [(joueur == null ) ? new Joueur(TypeJoueur.Joueur) : joueur, new Joueur(TypeJoueur.Ia)];
+    //console.log(this.joueurs)
 
 
     this.scene = new BABYLON.Scene(configuration.engine);
@@ -362,7 +366,7 @@ class Niveau {
       inter.vagueRestante -= 1;
       inter.MajInfoVague(inter);
 
-      instance.test();
+      //instance.test();
 
       if (nbVagueRestante < 1) {
         instance.finNiveau(false);
@@ -374,15 +378,6 @@ class Niveau {
     for (const base of this.basesSecondaires.concat(this.basesPrincipales[1])) {
       this.ciblerUnites(base, vague);
     }
-
-
-
-
-    /** @TODO */
-    // Retirer les anims, mettre les unites et la vague a null, enlever les event, vider les tableau de cibles à portée
-
-    
-
 
   }
 
@@ -412,6 +407,9 @@ class Niveau {
 
   test(){
     // Dispose tout ce qui traine
+    /**
+     * @TODO si bug
+     */
     console.log("fin vague");
   }
 
@@ -419,11 +417,16 @@ class Niveau {
 
   finNiveau(etat) {
     // Netoyer jeu
+    // Faire une annimation de fin par ce que c'est triste ici
     if (etat) {
       console.log("Gagné")
     } else {
       console.log("Perdu")
     }
+    
+    this.joueurs[0].retirerObserver();
+    this.configuration.createNewEngine();
+    new FinLvl(this.configuration, this.difficulte, this.joueurs[0], this.labelNiveau);
   }
 
 }
