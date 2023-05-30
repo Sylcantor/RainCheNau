@@ -27,11 +27,10 @@ class Niveau {
     this.nombreVagueRestante = ((difficulte + 1) * 5) - (Math.floor(difficulte / 1));
     this.nombreVague = ((difficulte + 1) * 5) - (Math.floor(difficulte / 1));
 
+    // this.nombreVagueRestante = 1;
+    // this.nombreVague = 1;
 
-    //this.temps = 4;
-    //console.log(joueur)
     this.joueurs = [(joueur == null ) ? new Joueur(TypeJoueur.Joueur) : joueur, new Joueur(TypeJoueur.Ia)];
-    //console.log(this.joueurs)
 
 
     this.scene = new BABYLON.Scene(configuration.engine);
@@ -79,6 +78,8 @@ class Niveau {
 
     // bases secondaires
     this.basesSecondaires = this.CreerBasesSecondaires();
+
+
 
 
     this.effeScene();
@@ -223,13 +224,13 @@ class Niveau {
     let cube = BABYLON.MeshBuilder.CreateBox("BP1", { size: 0.5 });
     cube.position = splinePoints[0];
     cube.material = new BABYLON.StandardMaterial("MatBP1");
-    let basePrincipale1 = new BasePrincipale(cube, this.joueurs[0]);
+    let basePrincipale1 = new BasePrincipale(cube, this.joueurs[0], this.difficulte);
 
     // création de la base princpale de l'ia
     let cube2 = cube.clone("BP1");
     cube2.material = cube.material.clone("MatBP2");
     cube2.position = splinePoints[splinePoints.length - 1];
-    let basePrincipale2 = new BasePrincipale(cube2, this.joueurs[1]);
+    let basePrincipale2 = new BasePrincipale(cube2, this.joueurs[1], this.difficulte);
 
     return [basePrincipale1, basePrincipale2];
   }
@@ -268,7 +269,7 @@ class Niveau {
       let index5Avant = (index - 5 < 0) ? 0 : index - 5;
       pointsDispos.splice(index5Avant, 10); // enlever pts avant
 
-      basesSecondaires.push(new BaseSecondaire(clone, this.joueurs[1]));
+      basesSecondaires.push(new BaseSecondaire(clone, this.joueurs[1], this.difficulte));
       i++;
     }
     cylindre.dispose();

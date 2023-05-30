@@ -8,9 +8,9 @@ class BaseSecondaire extends BaseAbstract{
     * Constructeur
     * @param {BABYLON.Mesh} cibleMesh Mesh associé à la base
     */
-    constructor(cibleMesh, joueur) {
+    constructor(cibleMesh, joueur, difficulte) {
         //Statistiques
-        super(cibleMesh, joueur, 10, 1, 2, 2);
+        super(cibleMesh, joueur, 10 *(1+0.1*difficulte) , 1*(1+0.1*difficulte), 2*(1+0.1*difficulte), 2*(1+0.1*difficulte));
 
     }
 

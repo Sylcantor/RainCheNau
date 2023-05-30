@@ -8,9 +8,11 @@ class BasePrincipale extends BaseAbstract {
     * Constructeur
     * @param {BABYLON.Mesh} cibleMesh Mesh associé à la base
     */
-    constructor(cibleMesh, joueur) {
+    constructor(cibleMesh, joueur, difficulte) {
         //Statistiques
-        super(cibleMesh, joueur, 25, 2, 2.5, 1);
+        super(cibleMesh, joueur, 25*(1+0.25*difficulte), 2*(1+0.25*difficulte), 2.5*(1+0.25*difficulte), 1*(1+0.25*difficulte));
+
+        
         this.cibleMesh.showBoundingBox = true;
 
         this.observerEtatBP = new BABYLON.Observable();
