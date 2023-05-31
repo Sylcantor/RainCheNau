@@ -29,7 +29,7 @@ class FinLvl {
      * Configurer tout les eléménts de la scene et recharger régulierement le rendu scene
      */
     configureAssetManager() {
-        let music = new BABYLON.Sound("Violons", "../../ressources/musiques/Sneaky-Snitch.mp3", this.scene, null, { loop: true, autoplay: true });
+        let music = new BABYLON.Sound("theme", "ressources/musiques/Sneaky-Snitch.mp3", this.scene, null, { loop: true, autoplay: true });
 
         //console.log(this.configuration)
         var instance = this;

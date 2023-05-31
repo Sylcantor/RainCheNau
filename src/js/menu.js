@@ -31,7 +31,7 @@ class SceneParDefaut {
         //console.log(this.configuration)
         var instance = this;
 
-        let music = new BABYLON.Sound("Violons", "../../ressources/musiques/Sneaky-Snitch.mp3", this.scene, null, { loop: true, autoplay: true });
+        let music = new BABYLON.Sound("theme", "ressources/musiques/Sneaky-Snitch.mp3", this.scene, null, { loop: true, autoplay: true });
 
         instance.creerElementsScene();  //  Call the createScene function
 
@@ -100,7 +100,7 @@ class SceneParDefaut {
      */
     creerInterface() {
         var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
-        let imageTitre = new BABYLON.GUI.Image("Titre", "../../ressources/images/titre.png");
+        let imageTitre = new BABYLON.GUI.Image("Titre", "ressources/images/titre.png");
         imageTitre.width = "800px";
         imageTitre.height = "100px";
         imageTitre.top = "-250px;"
@@ -113,7 +113,7 @@ class SceneParDefaut {
 
 
         //var btnJouer = BABYLON.GUI.Button.CreateSimpleButton("btnJouer", "jouer");
-        var btnJouer = BABYLON.GUI.Button.CreateImageOnlyButton("btnJouer", "../../ressources/images/jouer.png");
+        var btnJouer = BABYLON.GUI.Button.CreateImageOnlyButton("btnJouer", "ressources/images/jouer.png");
         btnJouer.width = "300px";
         btnJouer.height = "100px";
         btnJouer.color = "white";
