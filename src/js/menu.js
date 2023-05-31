@@ -16,12 +16,12 @@ class SceneParDefaut {
         this.configuration.scenes.push(this.scene)// Mettre la scene en 1er dans la liste
 
         this.configureAssetManager();  //  Configure la scene et affiche le rendu à interval réguliers
-        
+
 
         this.scene.assetsManager.load();
 
     }
-//type="module"
+    //type="module"
 
     /**
      * Configurer tout les eléménts de la scene et recharger régulierement le rendu scene
@@ -35,7 +35,7 @@ class SceneParDefaut {
 
         instance.creerElementsScene();  //  Call the createScene function
 
-        
+
 
         instance.configuration.engine.runRenderLoop(function () {  //  Register a render loop to repeatedly render the scene
             instance.renderScene()
@@ -100,17 +100,30 @@ class SceneParDefaut {
      */
     creerInterface() {
         var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        let imageTitre = new BABYLON.GUI.Image("Titre", "../../ressources/images/titre.png");
+        imageTitre.width = "800px";
+        imageTitre.height = "100px";
+        imageTitre.top = "-250px;"
+        advancedTexture.addControl(imageTitre);
 
-        var btnJouer = BABYLON.GUI.Button.CreateSimpleButton("btnJouer", "jouer");
-        btnJouer.width = "150px";
-        btnJouer.height = "40px";
+
+
+
+
+
+
+        //var btnJouer = BABYLON.GUI.Button.CreateSimpleButton("btnJouer", "jouer");
+        var btnJouer = BABYLON.GUI.Button.CreateImageOnlyButton("btnJouer", "../../ressources/images/jouer.png");
+        btnJouer.width = "300px";
+        btnJouer.height = "100px";
         btnJouer.color = "white";
-        btnJouer.cornerRadius = 20;
-        btnJouer.background = "blue";
+        //btnJouer.cornerRadius = 20;
+        //btnJouer.background = "blue";
+
 
         btnJouer.onPointerUpObservable.add(() => {
             this.configuration.createNewEngine();
-            new Niveau(this.configuration,0);
+            new Niveau(this.configuration, 0);
 
         });
         advancedTexture.addControl(btnJouer);
