@@ -11,7 +11,7 @@ class Joueur {
     constructor(type) {
         this.type = type;
 
-        this.monnaie = 0;
+        this.monnaie = 1000000;
         this.score = 0;
 
         this.bonusPv = 0;

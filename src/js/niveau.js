@@ -418,12 +418,6 @@ class Niveau {
   finNiveau(etat) {
     // Netoyer jeu
     // Faire une annimation de fin par ce que c'est triste ici
-    if (etat) {
-      console.log("Gagné")
-    } else {
-      console.log("Perdu")
-    }
-    
     this.joueurs[0].retirerObserver();
     this.configuration.createNewEngine();
     new FinLvl(this.configuration, this.difficulte, this.joueurs[0], this.labelNiveau, this.nombreVagueRestante, etat);
