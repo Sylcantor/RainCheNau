@@ -52,6 +52,7 @@ class Niveau {
    * Configurer tout les eléménts de la scene et recharger régulierement le rendu scene
    */
   configureAssetManager() {
+    let music = new BABYLON.Sound("Violons", "../../ressources/musiques/Sneaky-Snitch.mp3", this.scene, null, { loop: true, autoplay: true });
     this.createElementsScene();
     this.registerRenderLoop();
   }

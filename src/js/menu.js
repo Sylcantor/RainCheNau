@@ -11,9 +11,14 @@ class SceneParDefaut {
     constructor(configuration) {
         this.configuration = configuration;
         this.scene = new BABYLON.Scene(configuration.engine);  //  Creates a basic Babylon Scene object
+        this.scene.assetsManager = new BABYLON.AssetsManager(this.scene);
+
         this.configuration.scenes.push(this.scene)// Mettre la scene en 1er dans la liste
 
         this.configureAssetManager();  //  Configure la scene et affiche le rendu à interval réguliers
+        
+
+        this.scene.assetsManager.load();
 
     }
 //type="module"
@@ -26,7 +31,11 @@ class SceneParDefaut {
         //console.log(this.configuration)
         var instance = this;
 
+        let music = new BABYLON.Sound("Violons", "../../ressources/musiques/Sneaky-Snitch.mp3", this.scene, null, { loop: true, autoplay: true });
+
         instance.creerElementsScene();  //  Call the createScene function
+
+        
 
         instance.configuration.engine.runRenderLoop(function () {  //  Register a render loop to repeatedly render the scene
             instance.renderScene()
