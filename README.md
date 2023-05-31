@@ -12,9 +12,7 @@ This project is a prototype submission for the [Games On Web 2023](https://www.c
 ## Table of Contents
 - [Introduction](#introduction)  
 - [Camera, Characters, and Controls](#camera-characters-and-controls)  
-- [Gameplay Loops](#gameplay-loops)  
 - [Victory and Defeat Conditions](#victory-and-defeat-conditions)  
-- [Heroes](#heroes)  
 - [Environment](#environment)  
 - [Game Structure](#game-structure)  
 - [Members](#members)  
@@ -37,25 +35,11 @@ This project is a prototype submission for the [Games On Web 2023](https://www.c
 - Character: The player controls a deck to create units  
 - Controls: See GDD for the comprehensive list of controls  
 
-<a id="gameplay-loops"></a>
-## Gameplay Loops  
-
-- Small loop: Obtain a stronger card -> Manage cards effectively -> Acquire a stronger card, etc.  
-- Medium loop: Launch a powerful wave -> Manage cards well -> Large number of units and/or powerful units -> Launch a powerful wave, etc.  
-- Large loop: Destroy a target -> Optimize waves over several turns -> Target destroyed -> Destroy a target, etc.  
-
 <a id="victory-and-defeat-conditions"></a>
 ## Victory and Defeat Conditions  
 
 - Victory: Destroy the main base of all enemies  
 - Defeat: The enemy's main base is not destroyed by the end of the game or the player's main base is destroyed  
-
-<a id="heroes"></a>
-## Heroes  
-
-- The player controls a deck of cards, their main base, and any secondary bases they have conquered  
-- The deck consists of cards with different types and effects  
-- The player can use currency to improve their deck  
 
 <a id="environment"></a>
 ## Environment  
