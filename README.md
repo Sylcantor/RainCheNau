@@ -18,6 +18,7 @@ This project is a prototype submission for the [Games On Web 2023](https://www.c
 - [Environment](#environment)  
 - [Game Structure](#game-structure)  
 - [Members](#members)  
+- [Credits](#credits)  
 
 <a id="introduction"></a>
 ## Introduction  
@@ -77,3 +78,15 @@ This project is a prototype submission for the [Games On Web 2023](https://www.c
 - Ambre Journot  
 
 For more details, refer to the original [GDD](https://github.com/Sylcantor/RainCheNau/blob/main/docs/GDD.pdf) (in French).
+
+
+<a id="credits"></a>
+## Credits
+
+### Main theme
+Sneaky Snitch by Kevin MacLeod | https://incompetech.com/
+
+Music promoted by https://www.chosic.com/free-music/all/
+
+Creative Commons CC BY 3.0
+https://creativecommons.org/licenses/by/3.0/
