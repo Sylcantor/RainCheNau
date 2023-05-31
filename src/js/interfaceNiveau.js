@@ -29,7 +29,7 @@ class InterfaceNiveau {
     this.niveauAmeliorationPv = 0;
 
     this.advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
-    this.CreerBoutonPause();
+    //this.CreerBoutonPause();
     this.CreerBoutonDupliquer();
     this.CreerBoutonFusionner();
     this.CreerBoutonFusionner2();
@@ -41,8 +41,6 @@ class InterfaceNiveau {
     this.advancedTexture.addControl(this.CreerLabelEtConteneur("vague", vagueRestante + "/" + vague, "0", "450"));
 
     this.descriptionVague;
-
-    let txtTuto;
 
     if (difficulte == 0){
       this.creerTutoriel()
@@ -549,7 +547,7 @@ class InterfaceNiveau {
     buttonPrecedant.onPointerUpObservable.clear();
 
 
-    labelTexte.text = "Vous pouvez cliquer sur les bases pour obtenir \ndes information. \n\n En attaquant une base des unités seront \nenvoyées pour la détruire.";
+    labelTexte.text = "Vous pouvez cliquer sur les bases pour obtenir \ndes information. \n\n En attaquant une base des unités seront \nenvoyées pour la détruire.\n\n utlisez les touches directionnelle pour \ndeplacer la caméra.";
     buttonPrecedant.isVisible = true;
 
     let inter= this;
