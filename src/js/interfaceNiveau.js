@@ -37,10 +37,16 @@ class InterfaceNiveau {
 
     this.advancedTexture.addControl(this.CreerLabelEtConteneur("niveau", "lvl." + niveau, "0", "0"));
     this.advancedTexture.addControl(this.CreerLabelEtConteneur("monnaie", this.joueurHumain.monnaie + ' or', "0", "150"));
-    this.advancedTexture.addControl(this.CreerLabelEtConteneur("score", this.joueurHumain.score + " pts", "0", "300"));
+    this.advancedTexture.addControl(this.CreerLabelEtConteneur("score", this.joueurHumain.score + " arbre", "0", "300"));
     this.advancedTexture.addControl(this.CreerLabelEtConteneur("vague", vagueRestante + "/" + vague, "0", "450"));
 
     this.descriptionVague;
+
+    let txtTuto;
+
+    if (difficulte == 0){
+      this.creerTutoriel()
+    }
 
 
 
@@ -150,9 +156,6 @@ class InterfaceNiveau {
     if (nom == "previsualisation_attaque") {
       this.descriptionVague = rectangle;
     }
-
-
-
     this.advancedTexture.removeControl(rectangle);
 
 
@@ -428,7 +431,7 @@ class InterfaceNiveau {
    */
   MajScore(interfaceJoueur) {
     let label = interfaceJoueur.advancedTexture.getDescendants(false, control => control.name === 'score')[0];
-    label.text = interfaceJoueur.joueurHumain.score + " pts";
+    label.text = interfaceJoueur.joueurHumain.score + " arbre";
   }
 
   /**
@@ -456,10 +459,6 @@ class InterfaceNiveau {
    * @param {InterfaceNiveau} interfaceJoueur 
    */
   MajInfoVague(interfaceJoueur) {
-    // console.log((5  + interfaceJoueur.joueurHumain.nombreBase + interfaceJoueur.joueurHumain.bonusNbUnite))
-    // console.log(interfaceJoueur.joueurHumain.nombreBase)
-    // console.log(interfaceJoueur.joueurHumain.bonusNbUnite)
-
 
     interfaceJoueur.descriptionVague.getDescendants()[0].text = "Vague n°"
       + (interfaceJoueur.vague - interfaceJoueur.vagueRestante + 1)
@@ -470,6 +469,130 @@ class InterfaceNiveau {
       + "\n Attaque : "
       + parseFloat(1 + interfaceJoueur.joueurHumain.bonusATK).toPrecision(3);
 
+  }
+
+  creerTutoriel(){
+    this.txtTuto = "Bienvenu dans Tree force.\n Votre but est de detruite la base principale \nennemie pour pour planter des arbres à la \nplace."
+    +"\n\n Vous avez un nombre limité de vagues pour \n réussir.";
+
+    let titre = this.CreerLabel("titreTuto", "Tutoriel");
+    titre.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+
+    let labelTexte = this.CreerLabel("contenuTuto", this.txtTuto);
+    labelTexte.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+    labelTexte.width = "400px";
+    labelTexte.height = "200px";
+    labelTexte.top = "50px";
+
+    let buttonSuivant = this.CreerBouton("btnTutoSuivant", "->", "0", "0");
+    buttonSuivant.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT
+    buttonSuivant.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM
+    buttonSuivant.paddingBottomInPixels = 3;
+    buttonSuivant.paddingRightInPixels = 3;
+
+    let buttonPrecedant = this.CreerBouton("btnTutoPrecedant", "<-", "0", "0");
+    buttonPrecedant.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
+    buttonPrecedant.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM
+    buttonPrecedant.paddingBottomInPixels = 3;
+    buttonPrecedant.paddingRightInPixels = 3;
+    buttonPrecedant.isVisible = false;
+
+
+    var rectangle = new BABYLON.GUI.Rectangle("conteneur_Tuto");
+    rectangle.width = "400px";
+    rectangle.height = "300px";
+    rectangle.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+    rectangle.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+    rectangle.top = "-10px";
+    rectangle.color = "black";
+    rectangle.thickness = 4;
+    rectangle.background = "green";
+
+
+    let inter= this;
+    buttonSuivant.onPointerUpObservable.add(() => inter.tutoPage2());
+
+    rectangle.addControl(titre);
+    rectangle.addControl(labelTexte);
+    rectangle.addControl(buttonSuivant);
+    rectangle.addControl(buttonPrecedant);
+
+    this.advancedTexture.addControl(rectangle);
+   
+
+  }
+
+  tutoPage1(){
+    let rectangle = this.advancedTexture.getDescendants(true, control => control.name === 'conteneur_Tuto')[0];
+    let buttonSuivant = rectangle.getChildByName("btnTutoSuivant");
+    let buttonPrecedant = rectangle.getChildByName("btnTutoPrecedant");
+    let labelTexte = rectangle.getChildByName("contenuTuto");
+
+    buttonSuivant.onPointerUpObservable.clear();
+    buttonPrecedant.onPointerUpObservable.clear();
+
+    buttonPrecedant.isVisible = false;
+    labelTexte.text = this.txtTuto;
+
+    let inter= this;
+    buttonSuivant.onPointerUpObservable.add(() => inter.tutoPage2());
+
+  }
+
+  tutoPage2(){
+    let rectangle = this.advancedTexture.getDescendants(true, control => control.name === 'conteneur_Tuto')[0];
+    let buttonSuivant = rectangle.getChildByName("btnTutoSuivant");
+    let buttonPrecedant = rectangle.getChildByName("btnTutoPrecedant");
+    let labelTexte = rectangle.getChildByName("contenuTuto");
+
+    buttonSuivant.onPointerUpObservable.clear();
+    buttonPrecedant.onPointerUpObservable.clear();
+
+
+    labelTexte.text = "Vous pouvez cliquer sur les bases pour obtenir \ndes information. \n\n En attaquant une base des unités seront \nenvoyées pour la détruire.";
+    buttonPrecedant.isVisible = true;
+
+    let inter= this;
+    buttonPrecedant.onPointerUpObservable.add(() => inter.tutoPage1());
+    buttonSuivant.onPointerUpObservable.add(() => inter.tutoPage3());
+  }
+
+  tutoPage3(){
+    let rectangle = this.advancedTexture.getDescendants(true, control => control.name === 'conteneur_Tuto')[0];
+    let buttonSuivant = rectangle.getChildByName("btnTutoSuivant");
+    let buttonPrecedant = rectangle.getChildByName("btnTutoPrecedant");
+    let labelTexte = rectangle.getChildByName("contenuTuto");
+
+    buttonSuivant.onPointerUpObservable.clear();
+    buttonPrecedant.onPointerUpObservable.clear();
+
+
+    labelTexte.text = "Prendre la base principale de ennemie \nvous permet de finir le niveau. \n\n Prendre une base secondaire vous donnera \nun bonus sur le nombre d'unités que vous \npouvez utiliser pour attaquer. ";
+    buttonPrecedant.isVisible = true;
+
+    let inter= this;
+    buttonSuivant.textBlock.text = "->";
+    buttonPrecedant.onPointerUpObservable.add(() => inter.tutoPage2());
+    buttonSuivant.onPointerUpObservable.add(() => inter.tutoPage4());
+  }
+
+  tutoPage4(){
+    let rectangle = this.advancedTexture.getDescendants(true, control => control.name === 'conteneur_Tuto')[0];
+    let buttonSuivant = rectangle.getChildByName("btnTutoSuivant");
+    let buttonPrecedant = rectangle.getChildByName("btnTutoPrecedant");
+    let labelTexte = rectangle.getChildByName("contenuTuto");
+
+    buttonSuivant.onPointerUpObservable.clear();
+    buttonPrecedant.onPointerUpObservable.clear();
+
+    labelTexte.text = "Vous pouvez aussi achetter des amélirations \npour obtenir des unités plus puissantes. \n\n Ces améliorations seront conservées pour les \nniveaux suivants.";
+    buttonPrecedant.isVisible = true;
+
+    buttonSuivant.textBlock.text = "Fermer";
+
+    let inter= this;
+    buttonPrecedant.onPointerUpObservable.add(() => inter.tutoPage3());
+    buttonSuivant.onPointerUpObservable.add(() => inter.advancedTexture.removeControl(rectangle));
   }
 
 
