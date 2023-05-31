@@ -150,6 +150,7 @@ class InterfaceNiveau {
     rectangle.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
     rectangle.top = -5 + "px";
     rectangle.left = -170 + "px";
+    rectangle.alpha = 0.75;
 
     if (nom == "previsualisation_attaque") {
       this.descriptionVague = rectangle;
@@ -194,7 +195,7 @@ class InterfaceNiveau {
 
     // informations du tooltip
     let prix = this.calculerCout(this.niveauAmeliorationNbUnite) * 5 * (this.difficulte + 1);
-    this.creerTooltip(button, "nb_unit_tooltip", "Ajoute une unité à chaque les vague \n Niveau : " + this.niveauAmeliorationNbUnite + "\n Effet : +" + this.calculBonusNbUnite() + " unité" + "\n cout améliotation : " + prix + " or");
+    this.creerTooltip(button, "nb_unit_tooltip", "Ajoute une unité à chaque les vague \n Niveau : " + this.niveauAmeliorationNbUnite + "\n Effet : +" + this.calculBonusNbUnite() + " unité" + "\n cout améliotation : " + Math.trunc(prix) + " or");
 
     let interfaceJoueur = this;
     button.onPointerUpObservable.add(function () {
@@ -206,7 +207,7 @@ class InterfaceNiveau {
 
       // Maj des informations
       prix = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationNbUnite) * 5 * (interfaceJoueur.difficulte + 1);
-      interfaceJoueur.MajTooltip("nb_unit_tooltip", "Ajoute une unité à chaque les vague \n Niveau : " + interfaceJoueur.niveauAmeliorationNbUnite + "\n Effet : +" + interfaceJoueur.calculBonusNbUnite() + " unité" + "\n cout améliotation : " + prix + " or");
+      interfaceJoueur.MajTooltip("nb_unit_tooltip", "Ajoute une unité à chaque les vague \n Niveau : " + interfaceJoueur.niveauAmeliorationNbUnite + "\n Effet : +" + interfaceJoueur.calculBonusNbUnite() + " unité" + "\n cout améliotation : " + Math.trunc(prix) + " or");
 
       interfaceJoueur.joueurHumain.baisserMonnaie(prixPrecedant);
 
@@ -234,7 +235,7 @@ class InterfaceNiveau {
 
 
     let prix = this.calculerCout(this.niveauAmeliorationAtk) * 2 * (this.difficulte + 1);
-    this.creerTooltip(button, "atk_tooltip", "Augmente la puissanse des unités \n Niveau : " + this.niveauAmeliorationAtk + "\n Effet : +" + this.calculBonusATK() + " attaque" + "\n cout améliotation : " + prix + " or");
+    this.creerTooltip(button, "atk_tooltip", "Augmente la puissanse des unités \n Niveau : " + this.niveauAmeliorationAtk + "\n Effet : +" + this.calculBonusATK() + " attaque" + "\n cout améliotation : " + Math.trunc(prix) + " or");
 
 
     let interfaceJoueur = this;
@@ -248,7 +249,7 @@ class InterfaceNiveau {
 
       // Maj des informations
       let prix = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationAtk) * 2 * (interfaceJoueur.difficulte + 1);
-      interfaceJoueur.MajTooltip("atk_tooltip", "Augmente la puissanse des unités \n Niveau : " + interfaceJoueur.niveauAmeliorationAtk + "\n Effet : +" + parseFloat(interfaceJoueur.calculBonusATK()).toPrecision(3) + " attaque" + "\n cout améliotation : " + prix + " or");
+      interfaceJoueur.MajTooltip("atk_tooltip", "Augmente la puissanse des unités \n Niveau : " + interfaceJoueur.niveauAmeliorationAtk + "\n Effet : +" + parseFloat(interfaceJoueur.calculBonusATK()).toPrecision(3) + " attaque" + "\n cout améliotation : " + Math.trunc(prix) + " or");
       interfaceJoueur.joueurHumain.baisserMonnaie(prixPrecedant);
 
       // mise a jour de la prévisualisation de la vague
@@ -275,7 +276,7 @@ class InterfaceNiveau {
 
     let prix = this.calculerCout(this.niveauAmeliorationPv) * (this.difficulte + 1);
     //console.log(prix);
-    this.creerTooltip(button, "pv_tooltip", "Augmente les points de vie des unités \n Niveau : " + this.niveauAmeliorationPv + "\n Effet : +" + this.calculBonusPV() + " pv" + "\n cout améliotation : " + prix + " or");
+    this.creerTooltip(button, "pv_tooltip", "Augmente les points de vie des unités \n Niveau : " + this.niveauAmeliorationPv + "\n Effet : +" + this.calculBonusPV() + " pv" + "\n cout améliotation : " + Math.trunc(prix) + " or");
 
     let interfaceJoueur = this;
     button.onPointerUpObservable.add(function () {
@@ -289,7 +290,7 @@ class InterfaceNiveau {
       // Maj des informations
       let prix = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationPv) * (interfaceJoueur.difficulte + 1);
 
-      interfaceJoueur.MajTooltip("pv_tooltip", "Augmente les points de vie des unités \n Niveau : " + interfaceJoueur.niveauAmeliorationPv + "\n Effet : +" + parseFloat(interfaceJoueur.calculBonusPV()).toPrecision(3) + " pv" + "\n cout améliotation : " + prix + " or");
+      interfaceJoueur.MajTooltip("pv_tooltip", "Augmente les points de vie des unités \n Niveau : " + interfaceJoueur.niveauAmeliorationPv + "\n Effet : +" + parseFloat(interfaceJoueur.calculBonusPV()).toPrecision(3) + " pv" + "\n cout améliotation : " + Math.trunc(prix) + " or");
 
       interfaceJoueur.joueurHumain.baisserMonnaie(prixPrecedant);
 
@@ -342,7 +343,7 @@ class InterfaceNiveau {
 
     rectangle.cornerRadius = 10;
     rectangle.color = "black";
-    rectangle.thickness = 4;
+    //rectangle.thickness = 4;
     rectangle.background = "green";
 
     rectangle.addControl(label);
@@ -375,7 +376,7 @@ class InterfaceNiveau {
     panel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
     panel.top = "100px";
     panel.color = "black";
-    panel.thickness = 4;
+    //panel.thickness = 4;
     panel.background = "green";
 
     this.advancedTexture.addControl(panel);
@@ -470,7 +471,7 @@ class InterfaceNiveau {
   }
 
   creerTutoriel(){
-    this.txtTuto = "Bienvenu dans Tree force.\n Votre but est de detruite la base principale \nennemie pour pour planter des arbres à la \nplace."
+    this.txtTuto = "Bienvenu dans Tree force.\n Votre but est de détruire la base principale \nennemie pour pour planter des arbres à la \nplace."
     +"\n\n Vous avez un nombre limité de vagues pour \n réussir.";
 
     let titre = this.CreerLabel("titreTuto", "Tutoriel");
@@ -504,8 +505,9 @@ class InterfaceNiveau {
     rectangle.top = "10px";
     rectangle.left = "-10px";
     rectangle.color = "black";
-    rectangle.thickness = 4;
+    //rectangle.thickness = 0;
     rectangle.background = "green";
+    rectangle.alpha = 0.75;
 
 
     let inter= this;
@@ -548,7 +550,7 @@ class InterfaceNiveau {
     buttonPrecedant.onPointerUpObservable.clear();
 
 
-    labelTexte.text = "Vous pouvez cliquer sur les bases pour obtenir \ndes information. \n\n En attaquant une base des unités seront \nenvoyées pour la détruire.\n\n utlisez les touches directionnelle pour \ndeplacer la caméra.";
+    labelTexte.text = "Vous pouvez cliquer sur les bases pour obtenir \ndes information. \n\n En attaquant une base des unités seront \nenvoyées pour la détruire.\n\n Utlisez les touches directionnelle pour \ndéplacer la caméra.";
     buttonPrecedant.isVisible = true;
 
     let inter= this;
@@ -566,7 +568,7 @@ class InterfaceNiveau {
     buttonPrecedant.onPointerUpObservable.clear();
 
 
-    labelTexte.text = "Prendre la base principale de ennemie \nvous permet de finir le niveau. \n\n Prendre une base secondaire vous donnera \nun bonus sur le nombre d'unités que vous \npouvez utiliser pour attaquer. ";
+    labelTexte.text = "Prendre la base principale de l'ennemi \nvous permet de finir le niveau. \n\n Prendre une base secondaire vous donnera \nun bonus sur le nombre d'unités que vous \npouvez utiliser pour attaquer. ";
     buttonPrecedant.isVisible = true;
 
     let inter= this;
