@@ -35,10 +35,10 @@ class InterfaceNiveau {
     this.CreerBoutonFusionner2();
     this.CreerPanneauDescription();
 
-    this.advancedTexture.addControl(this.CreerLabelEtConteneur("niveau", "lvl." + niveau, "0", "0"));
-    this.advancedTexture.addControl(this.CreerLabelEtConteneur("monnaie", this.joueurHumain.monnaie + ' or', "0", "150"));
-    this.advancedTexture.addControl(this.CreerLabelEtConteneur("score", this.joueurHumain.score + " arbre", "0", "300"));
-    this.advancedTexture.addControl(this.CreerLabelEtConteneur("vague", vagueRestante + "/" + vague, "0", "450"));
+    this.advancedTexture.addControl(this.CreerLabelEtConteneur("niveau", "niveau. " + niveau, "0", "0"));
+    this.advancedTexture.addControl(this.CreerLabelEtConteneur("monnaie", this.joueurHumain.monnaie + ' or', "45", "0"));
+    this.advancedTexture.addControl(this.CreerLabelEtConteneur("score", this.joueurHumain.score + " arbre", "45", "300"));
+    this.advancedTexture.addControl(this.CreerLabelEtConteneur("vague", vagueRestante + "/" + vague + " vague", "0", "300"));
 
     this.descriptionVague;
 
@@ -330,7 +330,7 @@ class InterfaceNiveau {
     var label = this.CreerLabel(nomLabel, texte);
 
     var rectangle = new BABYLON.GUI.Rectangle("conteneur_" + nomLabel);
-    rectangle.width = "150px";
+    rectangle.width = "300px";
     rectangle.height = "40px";
 
     //Placement en haut à gauche
@@ -366,14 +366,14 @@ class InterfaceNiveau {
     button.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT
     button.paddingBottomInPixels = 3;
     button.paddingRightInPixels = 3;
-    button.isEnabled = false;
+    button.isVisible = false;
 
     let panel = new BABYLON.GUI.StackPanel("BarreInfo");
     this.advancedTexture.addControl(panel);
     panel.width = "400px";
     panel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
     panel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
-    panel.top = "50px";
+    panel.top = "100px";
     panel.color = "black";
     panel.thickness = 4;
     panel.background = "green";
@@ -404,11 +404,11 @@ class InterfaceNiveau {
       panel.getChildByName("VitAtk").text = "Vitesse attaque: " + parseFloat(base.vitesseAttaque).toPrecision(3);
       panel.getChildByName("Atk").text = "Attaque: " + parseFloat(base.attaque).toPrecision(3);
 
-      // console.log(TypeJoueur.Joueur);
-      // console.log(base.joueur.type);
+      ((TypeJoueur.Joueur != base.joueur.type) && this.peutLancerVague) ? panel.getChildByName("btnLancerVague").isVisible = true : panel.getChildByName("btnLancerVague").isVisible = false;
 
-
-      ((TypeJoueur.Joueur != base.joueur.type) && this.peutLancerVague) ? panel.getChildByName("btnLancerVague").isEnabled = true : panel.getChildByName("btnLancerVague").isEnabled = false;
+      // isVisible fait apparaitre une ligne verte moche 
+      this.advancedTexture.removeControl(panel);
+      this.advancedTexture.addControl(panel);
     }
 
   }
@@ -499,9 +499,10 @@ class InterfaceNiveau {
     var rectangle = new BABYLON.GUI.Rectangle("conteneur_Tuto");
     rectangle.width = "400px";
     rectangle.height = "300px";
-    rectangle.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-    rectangle.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
-    rectangle.top = "-10px";
+    rectangle.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+    rectangle.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+    rectangle.top = "10px";
+    rectangle.left = "-10px";
     rectangle.color = "black";
     rectangle.thickness = 4;
     rectangle.background = "green";

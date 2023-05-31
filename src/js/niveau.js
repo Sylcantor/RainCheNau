@@ -327,9 +327,10 @@ class Niveau {
   CreerVague() {
     // Empécher de lancer plusieurs vagues
     let inter = this.scene.interface;
-    let panel = inter.advancedTexture.getDescendants(true, control => control.name === 'BarreInfo')[0];
-    panel.getChildByName("btnLancerVague").isEnabled = false;
+
+    // mettre le panneau de description pour cacher le boutton lancerVague
     inter.peutLancerVague = false;
+    inter.MAJPanneauDescription(inter.baseCliquee);
 
     // Maj interface graphique
     this.nombreVagueRestante -= 1;
