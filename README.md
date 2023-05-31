@@ -83,7 +83,9 @@ This project is a prototype submission for the [Games On Web 2023](https://www.c
 
 ### Main theme
 Sneaky Snitch by Kevin MacLeod | https://incompetech.com/
+
 Music promoted by https://www.chosic.com/free-music/all/
+
 Creative Commons CC BY 3.0
 https://creativecommons.org/licenses/by/3.0/
 
