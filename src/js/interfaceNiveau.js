@@ -439,7 +439,7 @@ class InterfaceNiveau {
    */
   MajMonnaie(interfaceJoueur) {
     let label = interfaceJoueur.advancedTexture.getDescendants(false, control => control.name === 'monnaie')[0];
-    label.text = interfaceJoueur.joueurHumain.monnaie + " or";
+    label.text = Math.trunc(interfaceJoueur.joueurHumain.monnaie) + " or";
 
     let prixunit = interfaceJoueur.calculerCout(interfaceJoueur.niveauAmeliorationNbUnite) * 5 * (interfaceJoueur.difficulte + 1);
     (interfaceJoueur.joueurHumain.monnaie < prixunit) ? interfaceJoueur.advancedTexture.getDescendants(true, control => control.name === "btnDupliquer")[0].isEnabled = false : interfaceJoueur.advancedTexture.getDescendants(true, control => control.name === "btnDupliquer")[0].isEnabled = true;
