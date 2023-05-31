@@ -106,7 +106,7 @@ class FinLvl {
         label_Fin.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
         label_Fin.top = "15px";
 
-        let label_difficulte = this.CreerLabelEtConteneur("score", "la difficulté était de : " + this.difficulte);
+        let label_difficulte = this.CreerLabelEtConteneur("score", "la difficulté était de : " +  Math.trunc(this.difficulte));
         label_difficulte.top = "-50px";
 
         let label_score = this.CreerLabelEtConteneur("score", "Vous avez planté : " + this.joueur.score + " arbres");
@@ -155,7 +155,7 @@ class FinLvl {
         var label = new BABYLON.GUI.TextBlock(nomLabel, "");
         label.width = 0.5;
         label.height = "40px";
-        label.width = "300px";
+        label.width = "100%";
         label.color = "white";
         label.text = texte;
         return label;
@@ -172,7 +172,7 @@ class FinLvl {
         var label = this.CreerLabel(nomLabel, texte);
 
         var rectangle = new BABYLON.GUI.Rectangle("conteneur_" + nomLabel);
-        rectangle.width = "300px";
+        rectangle.width = "100%";
         rectangle.height = "40px";
 
         rectangle.cornerRadius = 10;
