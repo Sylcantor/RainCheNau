@@ -466,12 +466,12 @@ class InterfaceNiveau {
       + "\n Point de vie : "
       + parseFloat(1 + interfaceJoueur.joueurHumain.bonusPV).toPrecision(3)
       + "\n Attaque : "
-      + parseFloat(1 + interfaceJoueur.joueurHumain.bonusATK).toPrecision(3);
+      + parseFloat(1 + interfaceJoueur.joueurHumain.bonusATK).toPrecision(3);// ... toi, tu est censé me faire une coupure au bout de 3 digits apres la virgule
 
   }
 
   creerTutoriel(){
-    this.txtTuto = "Bienvenu dans Tree force.\n Votre but est de détruire la base principale \nennemie pour pour planter des arbres à la \nplace."
+    this.txtTuto = "Bienvenu dans Tree force.\n Votre but est de détruire la base principale \nennemie pour planter des arbres à la \nplace."
     +"\n\n Vous avez un nombre limité de vagues pour \n réussir.";
 
     let titre = this.CreerLabel("titreTuto", "Tutoriel");
@@ -550,7 +550,7 @@ class InterfaceNiveau {
     buttonPrecedant.onPointerUpObservable.clear();
 
 
-    labelTexte.text = "Vous pouvez cliquer sur les bases pour obtenir \ndes information. \n\n En attaquant une base des unités seront \nenvoyées pour la détruire.\n\n Utlisez les touches directionnelle pour \ndéplacer la caméra.";
+    labelTexte.text = "Vous pouvez cliquer sur les bases pour obtenir \ndes informations. \n\n En attaquant une base des unités seront \nenvoyées pour la détruire.\n\n Utlisez les touches directionnelles pour \ndéplacer la caméra.";
     buttonPrecedant.isVisible = true;
 
     let inter= this;
@@ -586,7 +586,7 @@ class InterfaceNiveau {
     buttonSuivant.onPointerUpObservable.clear();
     buttonPrecedant.onPointerUpObservable.clear();
 
-    labelTexte.text = "Vous pouvez aussi achetter des amélirations \npour obtenir des unités plus puissantes. \n\n Ces améliorations seront conservées pour les \nniveaux suivants.";
+    labelTexte.text = "Vous pouvez aussi acheter des améliorations \npour obtenir des unités plus puissantes. \n\n Ces améliorations seront conservées pour les \nniveaux suivants.";
     buttonPrecedant.isVisible = true;
 
     buttonSuivant.textBlock.text = "Fermer";
